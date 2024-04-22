@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model champions {
+  id    Int    @id @default(autoincrement()) @db.UnsignedInt
+  key   String @db.VarChar(50)
+  name  String @db.VarChar(50)
+  title String @db.VarChar(50)
+}
+
+model matches {
+  id                   Int    @id @default(autoincrement()) @db.UnsignedInt
+  match_id             String @db.VarChar(50)
+  game_start_timestamp String @db.VarChar(50)
+  game_end_timestamp   String @db.VarChar(50)
+  queue_id             String @db.VarChar(50)
+}
+
+model participants {
+  Id                                 Int     @id @default(autoincrement())
+  uuid                               String  @db.VarChar(100)
+  match_id                           String  @db.VarChar(50)
+  champion_name                      String? @db.VarChar(50)
+  champion_level                     String? @db.VarChar(50)
+  champion_experience                String? @db.VarChar(50)
+  damage_dealt_to_buildings          String? @db.VarChar(50)
+  damage_dealt_to_objectives         String? @db.VarChar(50)
+  damage_dealt_to_turrets            String? @db.VarChar(50)
+  damage_self_mitigated              String? @db.VarChar(50)
+  deaths                             String? @db.VarChar(50)
+  double_kills                       String? @db.VarChar(50)
+  dragon_kills                       String? @db.VarChar(50)
+  first_blood_assist                 String? @db.VarChar(50)
+  first_blood_kill                   String? @db.VarChar(50)
+  first_tower_assist                 String? @db.VarChar(50)
+  first_tower_kill                   String? @db.VarChar(50)
+  game_ended_in_surrender            String? @db.VarChar(50)
+  gold_earned                        String? @db.VarChar(50)
+  gold_spent                         String? @db.VarChar(50)
+  individual_position                String? @db.VarChar(50)
+  inhibitor_kills                    String? @db.VarChar(50)
+  inhibitor_takedowns                String? @db.VarChar(50)
+  killing_sprees                     String? @db.VarChar(50)
+  kills                              String? @db.VarChar(50)
+  lane                               String? @db.VarChar(50)
+  largest_critical_strike            String? @db.VarChar(50)
+  largest_killing_spree              String? @db.VarChar(50)
+  largest_multikill                  String? @db.VarChar(50)
+  longest_time_spent_living          String? @db.VarChar(50)
+  magic_damage_dealt                 String? @db.VarChar(50)
+  magic_damage_dealt_to_champions    String? @db.VarChar(50)
+  magic_damage_taken                 String? @db.VarChar(50)
+  neutral_minions_killed             String? @db.VarChar(50)
+  penta_kills                        String? @db.VarChar(50)
+  physical_damage_dealt              String? @db.VarChar(50)
+  physical_damage_dealt_to_champions String? @db.VarChar(50)
+  physical_damage_taken              String? @db.VarChar(50)
+  quadra_kills                       String? @db.VarChar(50)
+  lane_role                          String? @db.VarChar(50)
+  team_position                      String? @db.VarChar(50)
+  total_damage_dealt                 String? @db.VarChar(50)
+  total_damage_dealt_to_champions    String? @db.VarChar(50)
+  total_damageshielded_on_teammates  String? @db.VarChar(50)
+  total_damage_taken                 String? @db.VarChar(50)
+  total_heal                         String? @db.VarChar(50)
+  total_heals_on_teammates           String? @db.VarChar(50)
+  total_minions_killed               String? @db.VarChar(50)
+  total_time_CC_dealt                String? @db.VarChar(50)
+  total_units_healed                 String? @db.VarChar(50)
+  triple_kills                       String? @db.VarChar(50)
+  true_damage_dealt                  String? @db.VarChar(50)
+  true_damage_dealt_to_champions     String? @db.VarChar(50)
+  true_damage_taken                  String? @db.VarChar(50)
+  turret_kills                       String? @db.VarChar(50)
+  turret_takedowns                   String? @db.VarChar(50)
+  turrets_lost                       String? @db.VarChar(50)
+  unreal_kills                       String? @db.VarChar(50)
+  vision_wards_bought_in_game        String? @db.VarChar(50)
+  wards_killed                       String? @db.VarChar(50)
+  wards_placed                       String? @db.VarChar(50)
+  win                                String? @db.VarChar(50)
+
+  @@index([match_id], map: "FK_participants_matches")
+  @@index([uuid], map: "FK_participants_participants")
+}
+
+model users {
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  uuid       String  @db.VarChar(100)
+  game_name  String? @db.VarChar(50)
+  tag_line   String? @db.VarChar(50)
+  discord_id String? @db.VarChar(50)
+}

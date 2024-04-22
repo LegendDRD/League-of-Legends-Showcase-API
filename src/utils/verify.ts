@@ -1,4 +1,4 @@
-import { db } from '../db';
+// import { db } from '../db';
 import jwt from 'jsonwebtoken';
 
 export = (req: any, res: any, next: any) => {

@@ -12,6 +12,7 @@ import { userRoute } from "./routes/user/user";
 
 
 if (!process.env.PORT) {
+    console.log("Server Closed \nPlease add a .end")
     process.exit(1);
 }
 
@@ -29,6 +30,6 @@ app.use("/v1/user", userRoute);
 app.use(errorHandler);
 app.use(notFoundHandler);
 
-app.listen(PORT || 3004, () => {
+app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });
