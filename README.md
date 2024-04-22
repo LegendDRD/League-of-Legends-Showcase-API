@@ -10,7 +10,7 @@ To start
 
 Steps for db updats it. Will create a new database in your local db server
 
-1. prisma db push (Generate a new database from schema)
-2. prisma generate (Will models based on the schema)
+1. npx prisma db push (Generate a new database from schema)
+2. npx prisma generate (Will models based on the schema)
 
 You're ready to start the server
