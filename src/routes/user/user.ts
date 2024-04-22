@@ -7,29 +7,59 @@ import jwt_decoder from '../../utils/jwt_decoder';
 import statusCode from '../../utils/statusCodeSender';
 import bcrypt from "bcrypt";
 import md5 from 'md5';
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, users } from '@prisma/client'
 export const userRoute = express.Router();
 
 const prisma = new PrismaClient()
 
-userRoute.get('/', async (req, res) => {
+userRoute.post('/linkme', async (req, res) => {
 
-    // const jwtUser: any = await jwt_decoder(req);
-    // const UserResult = await db.asyncPool(`SELECT * FROM users WHERE id=?`, [jwtUser.id]);
-    // delete UserResult[0].password;
-    // const UserAnResult = await db.asyncPool(`SELECT * FROM users_analytics WHERE user_id=?`, [jwtUser.id]);
+    const userLink: any = {
+        gameName: req.body.gameName,
+        tagLine: req.body.TagLine,
+        discordId: req.body.discordId
+    }
 
-    // res.send({ statusCode: 0, user: UserResult[0], analytics: UserAnResult[0] });
+    if (typeof userLink.gameName === 'undefined') {
+        return res.send({ statusCode: 1, message: "GameName Undefined" })
+    }
+    if (typeof userLink.tagLine === 'undefined') {
+        return res.send({ statusCode: 1, message: "TagLine Undefined" })
+    }
+    if (typeof userLink.discordId === 'undefined') {
+        return res.send({ statusCode: 1, message: "discordId Undefined" })
+    }
 
-    // const allUsers = await prisma.findMany({
-    //     include: {
-    //       posts: true,
-    //       profile: true,
-    //     },
-    //   })
-    const allUsers = await prisma.users.findMany({});
+    let foundUser: users[] | Boolean = false
+    if (userLink.discordId !== null) {
 
-    return res.send({ statusCode: 0, users: allUsers })
+        foundUser = await prisma.users.findMany({ where: { discord_id: userLink.discordId } });
+    } else {
+
+        foundUser = await prisma.users.findMany({ where: { discord_id: userLink.discordId } });
+    }
+
+
+    if (!foundUser || foundUser.length === 0) {
+        // User not found, add the user to the users table
+
+        //TODO Add a create function to call instead of rewrtiing this
+        const newUser = await prisma.users.create({
+            data: {
+                game_name: userLink.gameName,
+                tag_line: userLink.tagLine,
+                discord_id: userLink.discordId,
+                uuid: ""
+            }
+        });
+        console.log("New user added:", newUser);
+    } else {
+        // User found, handle accordingly
+    }
+
+
+
+    return res.send({ statusCode: 0, users: foundUser })
 })
 
 userRoute.post('/', async (req, res) => {
