@@ -126,7 +126,7 @@ type value = string | number | undefined | null;
 //     asyncPool
 // };
 
-export async function createUser(user: users) {
+export async function createUser(user: any) {
     const newUser = await prisma.users.create({
         data: {
             game_name: user.game_name,

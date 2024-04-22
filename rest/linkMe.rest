@@ -6,7 +6,7 @@ POST {{url}}/user/linkme
 Content-Type: application/json
 
 {
-  "gameName": "波崎さん",
-  "TagLine": "DAWG",
+  "gameName": "BigHandsBoris",
+  "TagLine": "EUW",
   "discordId": null
 }
