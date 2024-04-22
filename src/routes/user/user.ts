@@ -8,6 +8,7 @@ import statusCode from '../../utils/statusCodeSender';
 import bcrypt from "bcrypt";
 import md5 from 'md5';
 import { PrismaClient, users } from '@prisma/client'
+import { getUUIDBasedOnGameName } from '../../utils/lol_api';
 export const userRoute = express.Router();
 
 const prisma = new PrismaClient()
@@ -42,14 +43,14 @@ userRoute.post('/linkme', async (req, res) => {
 
     if (!foundUser || foundUser.length === 0) {
         // User not found, add the user to the users table
-
+        const riotResults: any = await getUUIDBasedOnGameName(userLink)
         //TODO Add a create function to call instead of rewrtiing this
         const newUser = await prisma.users.create({
             data: {
                 game_name: userLink.gameName,
                 tag_line: userLink.tagLine,
                 discord_id: userLink.discordId,
-                uuid: ""
+                uuid: riotResults.puuid
             }
         });
         console.log("New user added:", newUser);
