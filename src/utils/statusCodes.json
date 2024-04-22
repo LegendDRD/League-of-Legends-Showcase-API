@@ -1,0 +1,14 @@
+{
+    "readme": "this is where statusCode.codesender gets its list of errors and descriptions",
+    "0": "Successful",
+    "U0": "User Created Successful",
+    "U1": "Email is Undefined",
+    "U2": "Password is Undefined",
+    "U3": "First name is Undefined",
+    "U4": "Last name is Undefined",
+    "U5": "confirmPassword is Undefined",
+    "U6": "Passwords Doesn't Match",
+    "U7": "Email is already in User",
+    "R1": "Role Doesn't Exist",
+    "A1": "Failed to create Analytics"
+}

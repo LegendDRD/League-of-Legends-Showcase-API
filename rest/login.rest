@@ -1,0 +1,29 @@
+@url = http://127.0.0.1:4001/v1
+@Dev=https://airla-api.herokuapp.com/v1
+@devurl = ""
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRvd2llLmRhbWlhbkBnbWFpbC5jb20iLCJpZCI6MSwiZmlyc3RfbmFtZSI6IkRhbWlhbiIsImxhc3RfbmFtZSI6IkRvd2llIiwicm9sZV9pZCI6MSwidXNlcl9zdGF0dXMiOiJub3QgYWN0aXZlIiwiaWF0IjoxNjYzODQwMDIzLCJleHAiOjE2NjM5MjY0MjN9.mHc-QRJjcWJJ4247fC6VC7KsMAloitYmCqH9g60qooU
+
+################################
+POST {{url}}/user/login
+Content-Type: application/json
+
+{
+    "email":"dowie.damian@gmail.com",
+    "password":"test"
+}
+
+####
+GET {{url}}/user/
+Authorization: Bearer {{token}}
+
+####
+POST {{url}}/user/
+Content-Type: application/json
+
+{
+    "email":"Daniel@airla.com",
+    "password":"test",
+    "confirm_password":"test2",
+    "first_name":"Daniel",
+    "last_name":"Montile"
+}
