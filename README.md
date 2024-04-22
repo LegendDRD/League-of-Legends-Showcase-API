@@ -13,4 +13,4 @@ Steps for db updats it. Will create a new database in your local db server
 1. prisma db push (Generate a new database from schema)
 2. prisma generate (Will models based on the schema)
 
-Youre ready to start the server
+You're ready to start the server

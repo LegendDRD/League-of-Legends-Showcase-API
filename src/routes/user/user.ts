@@ -9,9 +9,10 @@ import bcrypt from "bcrypt";
 import md5 from 'md5';
 import { PrismaClient, users } from '@prisma/client'
 import { getUUIDBasedOnGameName } from '../../utils/lol_api';
+import { createUser } from '../../db';
 export const userRoute = express.Router();
-
 const prisma = new PrismaClient()
+
 
 userRoute.post('/linkme', async (req, res) => {
 
@@ -22,13 +23,13 @@ userRoute.post('/linkme', async (req, res) => {
     }
 
     if (typeof userLink.gameName === 'undefined') {
-        return res.send({ statusCode: 1, message: "GameName Undefined" })
+        return res.send({ statusCode: 5, message: "GameName Undefined" })
     }
     if (typeof userLink.tagLine === 'undefined') {
-        return res.send({ statusCode: 1, message: "TagLine Undefined" })
+        return res.send({ statusCode: 5, message: "TagLine Undefined" })
     }
     if (typeof userLink.discordId === 'undefined') {
-        return res.send({ statusCode: 1, message: "discordId Undefined" })
+        return res.send({ statusCode: 5, message: "discordId Undefined" })
     }
 
     let foundUser: users[] | Boolean = false
@@ -45,26 +46,14 @@ userRoute.post('/linkme', async (req, res) => {
         // User not found, add the user to the users table
         const riotResults: any = await getUUIDBasedOnGameName(userLink)
         //TODO Add a create function to call instead of rewrtiing this
-        const newUser = await prisma.users.create({
-            data: {
-                game_name: userLink.gameName,
-                tag_line: userLink.tagLine,
-                discord_id: userLink.discordId,
-                uuid: riotResults.puuid
-            }
-        });
-        console.log("New user added:", newUser);
-    } else {
-        // User found, handle accordingly
+        await createUser({ id: 0, uuid: riotResults.puuid, game_name: userLink.gameName, tag_line: userLink.tagLine, discord_id: userLink.discordId });
+
+        return res.send({ statusCode: 1, message: "User Linked" })
     }
 
 
 
-    return res.send({ statusCode: 0, users: foundUser })
+    return res.send({ statusCode: 1, message: "User Already Linked" })
 })
 
-userRoute.post('/', async (req, res) => {
-
-    return res.send({ statusCode: 0 });
-})
 

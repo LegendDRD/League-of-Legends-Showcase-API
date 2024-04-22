@@ -1,9 +1,7 @@
 @url = http://127.0.0.1:3004/v1
 @devurl = ""
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRvd2llLmRhbWlhbkBnbWFpbC5jb20iLCJpZCI6MSwiZmlyc3RfbmFtZSI6IkRhbWlhbiIsImxhc3RfbmFtZSI6IkRvd2llIiwicm9sZV9pZCI6MSwidXNlcl9zdGF0dXMiOiJub3QgYWN0aXZlIiwiaWF0IjoxNjYzODQwMDIzLCJleHAiOjE2NjM5MjY0MjN9.mHc-QRJjcWJJ4247fC6VC7KsMAloitYmCqH9g60qooU
-
-
-################################
+@token=
+###
 POST {{url}}/user/linkme
 Content-Type: application/json
 

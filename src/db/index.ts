@@ -1,6 +1,9 @@
 import mysql from 'mysql';
 import md5 from 'md5';
 import bcrypt from 'bcrypt';
+import { PrismaClient, users } from '@prisma/client'
+const prisma = new PrismaClient()
+
 // import { cLog } from '../utils/logger';
 // import delay from 'delay';
 
@@ -122,3 +125,14 @@ type value = string | number | undefined | null;
 //     AuthCheckRefreshtoken,
 //     asyncPool
 // };
+
+export async function createUser(user: users) {
+    const newUser = await prisma.users.create({
+        data: {
+            game_name: user.game_name,
+            tag_line: user.tag_line,
+            discord_id: user.discord_id,
+            uuid: user.uuid
+        }
+    });
+}
