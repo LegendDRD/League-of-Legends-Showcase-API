@@ -10,7 +10,9 @@ statusCodeSender.start();
 import { auth } from "./routes/auth/auth";
 import { userRoute } from "./routes/user/user";
 
+import { StartBot } from "./discordBot";
 
+StartBot();
 if (!process.env.PORT) {
     console.log("Server Closed \nPlease add a .end")
     process.exit(1);
