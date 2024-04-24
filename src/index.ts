@@ -12,11 +12,11 @@ import { userRoute } from "./routes/user/user";
 
 import { StartBot } from "./discordBot";
 
-StartBot();
 if (!process.env.PORT) {
     console.log("Server Closed \nPlease add a .end")
     process.exit(1);
 }
+StartBot();
 
 const PORT: number = parseInt(process.env.PORT as string, 10);
 
