@@ -1,7 +1,7 @@
 import mysql from 'mysql';
 import md5 from 'md5';
 import bcrypt from 'bcrypt';
-import { PrismaClient, users } from '@prisma/client'
+import { PrismaClient, users, participants, matches } from '@prisma/client'
 const prisma = new PrismaClient()
 
 
@@ -110,3 +110,14 @@ export async function checkForLink(userDBData: any, discordDBData: any) {
 
 }
 
+export async function stroreMatchDataToDB(data: Omit<matches, 'id'>) {
+    const matchData = await prisma.matches.create({
+        data: data
+    });
+
+    if (matchData !== null) {
+        return matchData;
+    } else {
+        return false;
+    }
+}
