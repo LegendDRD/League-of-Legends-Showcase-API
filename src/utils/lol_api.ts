@@ -1,7 +1,7 @@
 import axios from 'axios';
-export async function getUUIDBasedOnGameName(userRequest: any) {
+export async function getUUIDBasedOnGameName(userRequest: UserLink) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.gameName}/${userRequest.tagLine}`, {
+        let results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.game_name}/${userRequest.tag_line}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
         console.log(results.data);
@@ -9,5 +9,6 @@ export async function getUUIDBasedOnGameName(userRequest: any) {
 
     } catch (err: any) {
         console.log(err);
+        return null
     }
 }

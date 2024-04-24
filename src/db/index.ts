@@ -4,135 +4,109 @@ import bcrypt from 'bcrypt';
 import { PrismaClient, users } from '@prisma/client'
 const prisma = new PrismaClient()
 
-// import { cLog } from '../utils/logger';
-// import delay from 'delay';
 
-type value = string | number | undefined | null;
-//TODO Set up Database and Database Connection
-// const pool = mysql.createPool({
-//     connectionLimit: 10,
-//     host: process.env.MYSQL_HOST,
-//     password: process.env.MYSQL_PASS,
-//     user: process.env.MYSQL_USER,
-//     database: process.env.MYSQL_DB,
-//     port: parseInt(process.env.MYSQL_PORT || '3306', 10),
-//     timezone: '+02:00'
-// })
+export async function createUser(user: UserLink) {
+    let discordDBData = await checkForDiscord(user);
 
-// const AuthGetUser: (email: string, password: any) => Promise<any> = (email, password) => {
-//     return new Promise((resolve, reject) => {
+    if (!discordDBData) {
+        console.log('createDiscord')
+        discordDBData = await createDiscord(user)
+    }
+    let userDBData: any = await checkForuser(user)
 
-//         if (!email) return resolve(false);
-//         if (!password) return resolve(false);
+    if (!userDBData) {
+        console.log('createUser')
+        userDBData = await createUserDB(user)
+    }
 
-//         pool.query(`SELECT * FROM users WHERE email = ? LIMIT 1`, [email], async (err, res) => {
-//             if (err) {
-//                 return reject(err);
-//             }
+    let userToDiscordLink: any = await checkForLink(userDBData, discordDBData)
 
-//             if (res.length < 1) return resolve(false)
-//             if (!res[0].password) return resolve(false);
-//             if (res[0].password === '') return resolve(false);
+    if (!userToDiscordLink) {
+        console.log('CreatingLink')
+        await linkUserDiscord(userDBData, discordDBData)
+        console.log('User Linked to a Discord')
+        return
+    }
+    console.log('User Already Linked')
 
-//             const authed: any = await AuthCheckPassword(password.toString(), res[0].password, res[0].id);
-//             if (authed) {
-//                 delete res.password;
-//                 return resolve(res[0]);
-//             }
-//             else {
-//                 return resolve(false);
-//             }
-//         })
-//     });
-// }
+}
 
-// const AuthCheckRefreshtoken: (id: string | number, refreshTokenState: string) => Promise<any> = (id, refreshTokenState) => {
-//     return new Promise((resolve, reject) => {
+export async function createDiscord(user: UserLink) {
 
-//         if (id) {
-//             pool.query('SELECT * FROM users WHERE id=?', [id], (err, res) => {
-//                 if (err) {
+    const newDiscord = await prisma.discords.create({
+        data: {
+            discord_id: user.discord_id
+        }
+    });
+    return newDiscord
 
-//                     return resolve(false)
-//                 }
-//                 const userInfo = res[0];
+}
 
-//                 const userState: string = md5(`${userInfo.id}${userInfo.email}${userInfo.password}${userInfo.updated_at}`);
+export async function createUserDB(user: UserLink) {
 
-//                 if (userState === refreshTokenState) {
-//                     const returndata = {
-//                         email: userInfo.email,
-//                         password: userInfo.password
-//                     };
-//                     return resolve(returndata);
-//                 } else {
-
-//                     return resolve(false);
-//                 }
-//             })
-//         }
-//         else {
-
-//             return resolve(false);
-//         }
-
-//     })
-// }
-
-// function AuthCheckPassword(check: string, against: string, id: string | number) {
-//     return new Promise((resolve, reject) => {
-//         const hash = bcrypt.hashSync(check, 10);
-
-//         if (bcrypt.compareSync(check, against)) {
-//             return resolve(true)
-
-//         } else {
-
-//             if (check === against) {
-//                 if (id) {
-//                     pool.query('UPDATE users SET password=? WHERE id=?', [hash, id], (err, res) => {
-//                         if (err) {
-//                             return resolve(false)
-//                         }
-//                         return resolve(true);
-//                     })
-//                 }
-//                 else {
-//                     return resolve(true);
-//                 }
-//             }
-//             else {
-//                 return resolve(false);
-//             }
-//         }
-//     })
-// }
-
-// const asyncPool: (sql: string, args: value[]) => Promise<any> = (sql: string, args: value[]) => {
-//     return new Promise((resolve, reject) => {
-//         pool.query(sql, args, (err: any, res: any) => {
-//             if (err) {
-//                 console.log(err)
-//                 return reject(err)
-//             }
-//             return resolve(res);
-//         })
-//     })
-// }
-
-// export const db = {
-//     AuthGetUser,
-//     AuthCheckRefreshtoken,
-//     asyncPool
-// };
-
-export async function createUser(user: any) {
-    const newUser = await prisma.users.create({
+    const UserData = await prisma.users.create({
         data: {
             game_name: user.game_name,
             tag_line: user.tag_line,
-            discord_id: user.discord_id,
-            uuid: user.uuid
+            discord_user_id: user.discord_user_id,
+            uuid: user.uuid || null
+        }
+    });
+    return UserData
+
+}
+
+export async function linkUserDiscord(userDBData: any, discordDBData: any) {
+    // console.log(newUser, discordDBData);
+    // return
+    const userLinked = await prisma.users_discords.create({
+        data: {
+            user_id: userDBData.id,
+            discord_id: discordDBData.id
         }
     });
 }
+
+export async function checkForDiscord(user: UserLink) {
+    const found = await prisma.discords.findFirst({ where: { discord_id: user.discord_id } });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
+
+}
+
+export async function checkForuser(user: UserLink) {
+    const found = await prisma.users.findFirst({
+        where: {
+            game_name: user.game_name,
+            tag_line: user.tag_line
+        }
+    });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
+
+}
+
+export async function checkForLink(userDBData: any, discordDBData: any) {
+    const found = await prisma.users_discords.findFirst({
+        where: {
+            user_id: userDBData.id,
+            discord_id: discordDBData.id
+        }
+    });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
+
+}
+

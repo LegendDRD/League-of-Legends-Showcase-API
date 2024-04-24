@@ -16,10 +16,8 @@ if (!process.env.PORT) {
     console.log("Server Closed \nPlease add a .end")
     process.exit(1);
 }
-StartBot();
 
 const PORT: number = parseInt(process.env.PORT as string, 10);
-
 const app = express();
 
 app.use(helmet());
@@ -34,4 +32,7 @@ app.use(notFoundHandler);
 
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
+
 });
+
+StartBot();

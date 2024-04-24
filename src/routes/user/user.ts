@@ -14,45 +14,8 @@ export const userRoute = express.Router();
 const prisma = new PrismaClient()
 
 
-userRoute.post('/linkme', async (req, res) => {
+// userRoute.post('/linkme', async (req, res) => {
 
-    const userLink: any = {
-        gameName: req.body.gameName,
-        tagLine: req.body.TagLine,
-        discordId: req.body.discordId
-    }
-
-    if (typeof userLink.gameName === 'undefined') {
-        return res.send({ statusCode: 5, message: "GameName Undefined" })
-    }
-    if (typeof userLink.tagLine === 'undefined') {
-        return res.send({ statusCode: 5, message: "TagLine Undefined" })
-    }
-    if (typeof userLink.discordId === 'undefined') {
-        return res.send({ statusCode: 5, message: "discordId Undefined" })
-    }
-
-    let foundUser: users[] | Boolean = false
-    if (userLink.discordId !== null) {
-
-        foundUser = await prisma.users.findMany({ where: { discord_id: userLink.discordId } });
-    } else {
-        //TODO FIND by game_name if not discord id is used
-        foundUser = await prisma.users.findMany({ where: { game_name: userLink.gameName } });
-    }
-
-
-    if (!foundUser || foundUser.length === 0) {
-        // User not found, add the user to the users table
-        const riotResults: any = await getUUIDBasedOnGameName(userLink)
-        await createUser({ id: 0, uuid: riotResults.puuid, game_name: userLink.gameName, tag_line: userLink.tagLine, discord_id: userLink.discordId });
-
-        return res.send({ statusCode: 1, message: "User Linked" })
-    }
-
-
-
-    return res.send({ statusCode: 1, message: "User Already Linked" })
-})
+// })
 
 

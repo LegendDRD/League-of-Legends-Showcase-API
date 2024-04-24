@@ -91,9 +91,20 @@ model participants {
 }
 
 model users {
-  id         Int     @id @default(autoincrement()) @db.UnsignedInt
-  uuid       String  @db.VarChar(100)
-  game_name  String? @db.VarChar(50)
-  tag_line   String? @db.VarChar(50)
-  discord_id String? @db.VarChar(50)
+  id              Int     @id @default(autoincrement()) @db.UnsignedInt
+  uuid            String? @db.VarChar(100)
+  game_name       String? @db.VarChar(50)
+  tag_line        String? @db.VarChar(50)
+  discord_user_id String? @db.VarChar(50)
+}
+
+model discords {
+  id         Int    @id @default(autoincrement()) @db.UnsignedInt
+  discord_id String @unique(map: "discord_id") @db.VarChar(50)
+}
+
+model users_discords {
+  id         Int @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int @db.UnsignedInt
+  discord_id Int @db.UnsignedInt
 }
