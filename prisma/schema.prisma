@@ -20,6 +20,7 @@ model matches {
   game_start_timestamp String         @db.VarChar(50)
   game_end_timestamp   String         @db.VarChar(50)
   queue_id             String         @db.VarChar(50)
+  queue                queue_types?   @relation(fields: [queue_id], references: [queue_id])
   participants         participants[]
 }
 
@@ -113,4 +114,13 @@ model users_discords {
   id         Int @id @default(autoincrement()) @db.UnsignedInt
   user_id    Int @db.UnsignedInt
   discord_id Int @db.UnsignedInt
+}
+
+model queue_types {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  queue_id    String    @unique(map: "queue_id") @default("") @db.VarChar(50)
+  map         String?   @db.VarChar(1024)
+  description String?   @db.VarChar(1024)
+  notes       String?   @db.VarChar(1024)
+  matches     matches[]
 }
