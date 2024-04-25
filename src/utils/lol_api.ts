@@ -16,7 +16,7 @@ export async function getUUIDBasedOnGameName(userRequest: UserLink) {
 
 export async function getGetMatchesFromUUID(uuid: string) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids`, {
+        let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=50`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
 
@@ -33,7 +33,6 @@ export async function getGetMatchDataFromMatchID(matchId: string) {
         let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/${matchId}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
-
         return results.data
 
     } catch (err: any) {

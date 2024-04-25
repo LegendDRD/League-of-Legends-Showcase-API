@@ -15,15 +15,16 @@ model champions {
 }
 
 model matches {
-  id                   Int    @id @default(autoincrement()) @db.UnsignedInt
-  match_id             String @db.VarChar(50)
-  game_start_timestamp String @db.VarChar(50)
-  game_end_timestamp   String @db.VarChar(50)
-  queue_id             String @db.VarChar(50)
+  id                   Int            @id @default(autoincrement()) @db.UnsignedInt
+  match_id             String         @unique @db.VarChar(50)
+  game_start_timestamp String         @db.VarChar(50)
+  game_end_timestamp   String         @db.VarChar(50)
+  queue_id             String         @db.VarChar(50)
+  participants         participants[]
 }
 
 model participants {
-  Id                                 Int      @id @default(autoincrement()) @db.UnsignedInt
+  id                                 Int      @id @default(autoincrement()) @db.UnsignedInt
   uuid                               String   @db.VarChar(100)
   match_id                           String   @db.VarChar(100)
   champion_name                      String?  @db.VarChar(100)
@@ -87,17 +88,20 @@ model participants {
   win                                Boolean?
   summoner_id                        String?  @db.VarChar(100)
   vision_score                       Int?
+  match                              matches? @relation(fields: [match_id], references: [match_id])
+  user                               users?   @relation(fields: [uuid], references: [uuid])
 
   @@index([match_id], map: "FK_participants_matches")
   @@index([uuid], map: "FK_participants_participants")
 }
 
 model users {
-  id              Int     @id @default(autoincrement()) @db.UnsignedInt
-  uuid            String? @db.VarChar(100)
-  game_name       String? @db.VarChar(50)
-  tag_line        String? @db.VarChar(50)
-  discord_user_id String? @db.VarChar(50)
+  id              Int            @id @default(autoincrement()) @db.UnsignedInt
+  uuid            String?        @unique @db.VarChar(100)
+  game_name       String?        @db.VarChar(50)
+  tag_line        String?        @db.VarChar(50)
+  discord_user_id String?        @db.VarChar(50)
+  participants    participants[]
 }
 
 model discords {

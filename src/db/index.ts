@@ -2,6 +2,7 @@ import mysql from 'mysql';
 import md5 from 'md5';
 import bcrypt from 'bcrypt';
 import { PrismaClient, users, participants, matches } from '@prisma/client'
+import { match } from 'assert';
 const prisma = new PrismaClient()
 
 
@@ -137,7 +138,7 @@ export async function stroreMatchDataToDB(data: Omit<matches, 'id'>) {
     }
 }
 
-export async function stroreParticipantDataToDB(data: Omit<participants, 'Id'>) {
+export async function stroreParticipantDataToDB(data: Omit<participants, 'id'>) {
     const matchData = await prisma.participants.create({
         data
     });
@@ -161,5 +162,29 @@ export async function checkForMatch(matchId: string) {
     } else {
         return false;
     }
+
+}
+
+export async function getLast20MatchesbyUuid(user: users) {
+
+    if (user.uuid === null) {
+        console.log('No uuid found')
+        return
+    }
+
+    const results = await prisma.participants.findMany({
+        where: {
+            uuid: user.uuid
+        },
+        include: { match: true },
+        orderBy: {
+            match: {
+                game_start_timestamp: 'desc'
+            }
+        },
+        take: 50
+    })
+
+    return results
 
 }

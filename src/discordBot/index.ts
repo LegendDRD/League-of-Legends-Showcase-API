@@ -1,4 +1,5 @@
-import { checkForuserDiscord, createUser } from "../db";
+import { participants } from "@prisma/client";
+import { checkForuserDiscord, createUser, getLast20MatchesbyUuid } from "../db";
 import { getUUIDBasedOnGameName, stroreMatchData } from "../utils/lol_api";
 
 const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST } = require('discord.js');
@@ -27,7 +28,7 @@ client.on('ready', () => {
 client.on('messageCreate', (msgData: any) => {
 
     let message = msgData.content
-
+    console.log(message)
     //TODO Finsih off Registration of slash commands
     // RegCommandsOnServer(msgData)
 
@@ -42,7 +43,7 @@ client.on('messageCreate', (msgData: any) => {
                 LinkMeCommand(msgData, message)
                 break;
             case "stats":
-                HelpCommand(msgData)
+                GetStates(msgData)
                 break;
             case "leaderboard":
                 HelpCommand(msgData)
@@ -114,6 +115,23 @@ async function LinkMeCommand(msgData: any, message: string) {
 
     // }
 }
+async function GetStates(msgData: any) {
+
+    const userInfo = await checkForuserDiscord(msgData.author.id);
+
+    if (!userInfo) {
+        console.log("User not found");
+        return
+    }
+    const matches = await getLast20MatchesbyUuid(userInfo);
+    console.log("Matches: ", matches);
+    if (!matches?.length) {
+        console.log('no parts found')
+        return
+    }
+    let winRate = await CalWinRates(matches);
+    console.log("win rate: ", winRate, "%");
+}
 
 async function UpdateMatches(msgData: any, message: string) {
     msgData.channel.send({ content: "Just a sec" });
@@ -144,4 +162,18 @@ async function RegCommandsOnServer(msg: any) {
     }
     listOfGuildsReg.push(msg.guildId)
     // }
+}
+
+async function CalWinRates(matches: participants[]) {
+
+    let wins = 0;
+
+    for (let i = 0; i < matches.length; i++) {
+
+        if (matches[i].win) {
+            wins++;
+        }
+    }
+
+    return (wins / matches.length) * 100
 }
