@@ -1,5 +1,5 @@
 import { participants } from "@prisma/client";
-import { checkForuserDiscord, createUser, getLast20MatchesbyUuid } from "../db";
+import { checkForuserDiscord, createUser, getLast100MatchesbyUuid } from "../db";
 import { getUUIDBasedOnGameName, stroreMatchData } from "../utils/lol_api";
 
 const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST } = require('discord.js');
@@ -123,14 +123,14 @@ async function GetStates(msgData: any) {
         console.log("User not found");
         return
     }
-    const matches = await getLast20MatchesbyUuid(userInfo);
+    const matches = await getLast100MatchesbyUuid(userInfo);
     console.log("Matches: ", matches);
     if (!matches?.length) {
         console.log('no parts found')
         return
     }
     let winRate = await CalWinRates(matches);
-    console.log("win rate: ", winRate, "%");
+    console.log("win rate: ", winRate);
 }
 
 async function UpdateMatches(msgData: any, message: string) {
@@ -164,16 +164,67 @@ async function RegCommandsOnServer(msg: any) {
     // }
 }
 
-async function CalWinRates(matches: participants[]) {
+async function CalWinRates(matches: any) {
+    console.log(matches[0])
 
     let wins = 0;
+    let overAllWinRate = 0
+
+    let flexRankedMatchesWins = 0
+    let flexRankedMatchesCount = 0
+    let flexWinRate = 0;
+
+    let soloRankedMatchesWins = 0
+    let soloRankedMatchesCount = 0
+    let soloWinRate = 0;
+
+    let normalMatchesWins = 0
+    let normalMatchesCount = 0
+    let normalWinRate = 0;
+
+    let aramMatchesWins = 0
+    let aramMatchesCount = 0
+    let aramWinRate = 0;
+
 
     for (let i = 0; i < matches.length; i++) {
 
         if (matches[i].win) {
             wins++;
         }
-    }
 
-    return (wins / matches.length) * 100
+        if (matches[i].match.queue.queue_id === '440') {
+            flexRankedMatchesCount++;
+            if (matches[i].win) {
+                flexRankedMatchesWins++;
+            }
+        }
+        if (matches[i].match.queue.queue_id === '420') {
+            soloRankedMatchesCount++;
+            if (matches[i].win) {
+                soloRankedMatchesWins++;
+            }
+        }
+        if (matches[i].match.queue.queue_id === '430' || matches[i].match.queue.queue_id === '400') {
+            normalMatchesCount++;
+            if (matches[i].win) {
+                normalMatchesWins++;
+            }
+        }
+        if (matches[i].match.queue.queue_id === '450') {
+            aramMatchesCount++;
+            if (matches[i].win) {
+                aramMatchesWins++;
+            }
+        }
+
+
+    }
+    flexWinRate = (flexRankedMatchesWins / flexRankedMatchesCount) * 100
+    soloWinRate = (soloRankedMatchesWins / soloRankedMatchesCount) * 100
+    normalWinRate = (normalMatchesWins / normalMatchesCount) * 100
+    aramWinRate = (aramMatchesWins / aramMatchesCount) * 100
+    overAllWinRate = (wins / matches.length) * 100
+
+    return { flexWinRate, soloWinRate, normalWinRate, aramWinRate, overAllWinRate }
 }

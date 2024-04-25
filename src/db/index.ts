@@ -165,7 +165,7 @@ export async function checkForMatch(matchId: string) {
 
 }
 
-export async function getLast20MatchesbyUuid(user: users) {
+export async function getLast100MatchesbyUuid(user: users) {
 
     if (user.uuid === null) {
         console.log('No uuid found')
@@ -176,13 +176,20 @@ export async function getLast20MatchesbyUuid(user: users) {
         where: {
             uuid: user.uuid
         },
-        include: { match: true },
-        orderBy: {
+        include: {
             match: {
-                game_start_timestamp: 'desc'
+                include: {
+                    queue: true
+                }
             }
         },
-        take: 50
+        orderBy: {
+            match: {
+                game_start_timestamp: 'desc',
+
+            }
+        },
+        take: 100
     })
 
     return results
