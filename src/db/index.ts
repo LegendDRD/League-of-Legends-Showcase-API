@@ -94,6 +94,21 @@ export async function checkForuser(user: UserLink) {
 
 }
 
+export async function checkForuserDiscord(discordUserId: string) {
+    const found = await prisma.users.findFirst({
+        where: {
+            discord_user_id: discordUserId
+        }
+    });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
+
+}
+
 export async function checkForLink(userDBData: any, discordDBData: any) {
     const found = await prisma.users_discords.findFirst({
         where: {
@@ -120,4 +135,31 @@ export async function stroreMatchDataToDB(data: Omit<matches, 'id'>) {
     } else {
         return false;
     }
+}
+
+export async function stroreParticipantDataToDB(data: Omit<participants, 'Id'>) {
+    const matchData = await prisma.participants.create({
+        data
+    });
+
+    if (matchData !== null) {
+        return matchData;
+    } else {
+        return false;
+    }
+}
+
+export async function checkForMatch(matchId: string) {
+    const found = await prisma.matches.findFirst({
+        where: {
+            match_id: matchId
+        }
+    });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
+
 }

@@ -1,5 +1,5 @@
-import { createUser } from "../db";
-import { getUUIDBasedOnGameName } from "../utils/lol_api";
+import { checkForuserDiscord, createUser } from "../db";
+import { getUUIDBasedOnGameName, stroreMatchData } from "../utils/lol_api";
 
 const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -46,6 +46,9 @@ client.on('messageCreate', (msgData: any) => {
                 break;
             case "leaderboard":
                 HelpCommand(msgData)
+                break;
+            case "Update":
+                UpdateMatches(msgData, message)
                 break;
         }
     }
@@ -110,6 +113,22 @@ async function LinkMeCommand(msgData: any, message: string) {
     await createUser(userLink);
 
     // }
+}
+
+async function UpdateMatches(msgData: any, message: string) {
+    msgData.channel.send({ content: "Just a sec" });
+    let discord_user_id = msgData.author.id
+
+    const user = await checkForuserDiscord(discord_user_id)
+
+    if (!user || !user.uuid) {
+
+        console.log("User Not Found")
+        return
+    }
+
+    await stroreMatchData(user.uuid)
+    return msgData.channel.send({ content: "User Data Updated" });
 }
 
 async function RegCommandsOnServer(msg: any) {
