@@ -25,8 +25,8 @@ model matches {
 model participants {
   Id                                 Int      @id @default(autoincrement()) @db.UnsignedInt
   uuid                               String   @db.VarChar(100)
-  match_id                           String   @db.VarChar(50)
-  champion_name                      String?  @db.VarChar(50)
+  match_id                           String   @db.VarChar(100)
+  champion_name                      String?  @db.VarChar(100)
   champion_level                     Int?
   champion_experience                Int?
   damage_dealt_to_buildings          Int?
@@ -63,7 +63,6 @@ model participants {
   physical_damage_taken              Int?
   quadra_kills                       Int?
   lane_role                          String?  @db.VarChar(50)
-  summoner_id                        String?  @db.VarChar(50)
   team_position                      String?  @db.VarChar(50)
   total_damage_dealt                 Int?
   total_damage_dealt_to_champions    Int?
@@ -83,10 +82,11 @@ model participants {
   turrets_lost                       Int?
   unreal_kills                       Int?
   vision_wards_bought_in_game        Int?
-  vision_score                       Int?
   wards_killed                       Int?
   wards_placed                       Int?
   win                                Boolean?
+  summoner_id                        String?  @db.VarChar(100)
+  vision_score                       Int?
 
   @@index([match_id], map: "FK_participants_matches")
   @@index([uuid], map: "FK_participants_participants")
