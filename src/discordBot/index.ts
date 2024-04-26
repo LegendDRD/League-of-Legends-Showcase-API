@@ -1,6 +1,7 @@
-import { participants } from "@prisma/client";
-import { checkForuserDiscord, createUser, getLast100MatchesbyUuid } from "../db";
+import { participants, matches, Prisma } from "@prisma/client";
+import { checkForuserDiscord, createUser, getLast20MatchesbyUuid, getQueue } from "../db";
 import { getUUIDBasedOnGameName, stroreMatchData } from "../utils/lol_api";
+import { UserLink, participantsWithmatchAndQueue } from "../interfaces/InterfaceAndTypes";
 
 const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -43,12 +44,12 @@ client.on('messageCreate', (msgData: any) => {
                 LinkMeCommand(msgData, message)
                 break;
             case "stats":
-                GetStates(msgData)
+                GetStats(msgData, message)
                 break;
             case "leaderboard":
                 HelpCommand(msgData)
                 break;
-            case "Update":
+            case "update":
                 UpdateMatches(msgData, message)
                 break;
         }
@@ -115,22 +116,45 @@ async function LinkMeCommand(msgData: any, message: string) {
 
     // }
 }
-async function GetStates(msgData: any) {
-
+async function GetStats(msgData: any, message: string) {
+    msgData.channel.send({ content: "Just a sec" });
+    let type = message.slice(prefix.length).split(' ')[1]
     const userInfo = await checkForuserDiscord(msgData.author.id);
 
     if (!userInfo) {
         console.log("User not found");
         return
     }
-    const matches = await getLast100MatchesbyUuid(userInfo);
-    console.log("Matches: ", matches);
+    let queueId = "400";
+    switch (type) {
+        case "solo":
+            queueId = "420";
+            break;
+        case "flex":
+            queueId = "440";
+            break;
+        case "normal":
+            queueId = "400";
+            break;
+        case "aram":
+            queueId = "450";
+            break;
+        default:
+            type = "solo"
+            queueId = "400";
+            break;
+    }
+    console.log(type, queueId)
+    const matches = await getLast20MatchesbyUuid(userInfo, queueId);
+    console.log(matches?.length)
     if (!matches?.length) {
         console.log('no parts found')
-        return
+        return msgData.channel.send({ content: `No Games Found` });
     }
     let winRate = await CalWinRates(matches);
+    let visionAvg = await CalVisionRates(matches);
     console.log("win rate: ", winRate);
+    return msgData.channel.send({ content: `${type} \n win rate:  ${winRate}\n Vision Avg: ${visionAvg}\n in ${matches?.length} games ` });
 }
 
 async function UpdateMatches(msgData: any, message: string) {
@@ -164,67 +188,39 @@ async function RegCommandsOnServer(msg: any) {
     // }
 }
 
-async function CalWinRates(matches: any) {
-    console.log(matches[0])
-
+async function CalWinRates(matches: participantsWithmatchAndQueue[]) {
     let wins = 0;
     let overAllWinRate = 0
-
-    let flexRankedMatchesWins = 0
-    let flexRankedMatchesCount = 0
-    let flexWinRate = 0;
-
-    let soloRankedMatchesWins = 0
-    let soloRankedMatchesCount = 0
-    let soloWinRate = 0;
-
-    let normalMatchesWins = 0
-    let normalMatchesCount = 0
-    let normalWinRate = 0;
-
-    let aramMatchesWins = 0
-    let aramMatchesCount = 0
-    let aramWinRate = 0;
-
+    if (matches.length < 1) {
+        return { overAllWinRate }
+    }
 
     for (let i = 0; i < matches.length; i++) {
-
         if (matches[i].win) {
             wins++;
         }
-
-        if (matches[i].match.queue.queue_id === '440') {
-            flexRankedMatchesCount++;
-            if (matches[i].win) {
-                flexRankedMatchesWins++;
-            }
-        }
-        if (matches[i].match.queue.queue_id === '420') {
-            soloRankedMatchesCount++;
-            if (matches[i].win) {
-                soloRankedMatchesWins++;
-            }
-        }
-        if (matches[i].match.queue.queue_id === '430' || matches[i].match.queue.queue_id === '400') {
-            normalMatchesCount++;
-            if (matches[i].win) {
-                normalMatchesWins++;
-            }
-        }
-        if (matches[i].match.queue.queue_id === '450') {
-            aramMatchesCount++;
-            if (matches[i].win) {
-                aramMatchesWins++;
-            }
-        }
-
-
     }
-    flexWinRate = (flexRankedMatchesWins / flexRankedMatchesCount) * 100
-    soloWinRate = (soloRankedMatchesWins / soloRankedMatchesCount) * 100
-    normalWinRate = (normalMatchesWins / normalMatchesCount) * 100
-    aramWinRate = (aramMatchesWins / aramMatchesCount) * 100
+
     overAllWinRate = (wins / matches.length) * 100
 
-    return { flexWinRate, soloWinRate, normalWinRate, aramWinRate, overAllWinRate }
+    return overAllWinRate
+}
+
+async function CalVisionRates(matches: participantsWithmatchAndQueue[]) {
+    let visionTotal = 0;
+    let visionAvg = 0
+    if (matches.length < 1) {
+        return visionAvg
+    }
+
+    for (let i = 0; i < matches.length; i++) {
+        let element = matches[i]
+        if (element.vision_score !== null) {
+            visionTotal += element.vision_score;
+        }
+    }
+
+    visionAvg = (visionTotal / matches.length)
+
+    return visionAvg
 }

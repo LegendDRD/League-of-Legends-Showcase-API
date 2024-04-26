@@ -3,6 +3,7 @@ import md5 from 'md5';
 import bcrypt from 'bcrypt';
 import { PrismaClient, users, participants, matches } from '@prisma/client'
 import { match } from 'assert';
+import { UserLink } from '../interfaces/InterfaceAndTypes';
 const prisma = new PrismaClient()
 
 
@@ -165,16 +166,17 @@ export async function checkForMatch(matchId: string) {
 
 }
 
-export async function getLast100MatchesbyUuid(user: users) {
+export async function getLast20MatchesbyUuid(user: users, queueId: string) {
 
     if (user.uuid === null) {
         console.log('No uuid found')
         return
     }
-
+    //
     const results = await prisma.participants.findMany({
         where: {
-            uuid: user.uuid
+            uuid: user.uuid,
+            match: { queue_id: (queueId === '400' ? queueId || "430" : queueId) }
         },
         include: {
             match: {
@@ -189,9 +191,23 @@ export async function getLast100MatchesbyUuid(user: users) {
 
             }
         },
-        take: 100
+        take: 20
     })
 
     return results
+}
+
+export async function getQueue(name: string) {
+    const found = await prisma.queue_types.findFirst({
+        where: {
+
+        }
+    });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
 
 }

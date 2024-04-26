@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { checkForMatch, stroreMatchDataToDB, stroreParticipantDataToDB } from '../db';
+import { UserLink } from '../interfaces/InterfaceAndTypes';
 export async function getUUIDBasedOnGameName(userRequest: UserLink) {
     try {
         let results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.game_name}/${userRequest.tag_line}`, {
