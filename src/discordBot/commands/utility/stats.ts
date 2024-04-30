@@ -1,5 +1,5 @@
 import { checkForuserDiscord, getLast20MatchesbyUuid } from "../../../db";
-import { CalWinRates, CalVisionRates, AvgDamageDealtTochampions, CalSurrRates, AvgMinionsKilled, AvgGoldEarned } from "../../../utils/lolStats";
+import { CalWinRates, CalVisionRates, AvgDamageDealtTochampions, CalSurrRates, AvgMinionsKilled, AvgGoldEarned, AvgDurationOfGame, AvgDeathsGame, AvgKillsGame, TotaPentas, TotaQuadrs, TripleKills } from "../../../utils/lolStats";
 import { stroreMatchData } from "../../../utils/lol_api";
 
 const { SlashCommandBuilder } = require('discord.js');
@@ -10,13 +10,13 @@ module.exports = {
         .setDescription('get stats for selected games')
         .addStringOption((option: any) =>
             option.setName('type')
-                .setDescription('the type of match')
+                .setDescription('The type of match')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'solo', value: "solo" },
-                    { name: 'flex', value: "flex" },
-                    { name: 'normal', value: "normal" },
-                    { name: 'aram', value: "aram" },
+                    { name: 'Solo', value: "solo" },
+                    { name: 'Flex', value: "flex" },
+                    { name: 'Normal', value: "normal" },
+                    { name: 'Aram', value: "aram" },
                 )),
     async execute(interaction: any) {
         await interaction.deferReply({ ephemeral: true }); // Defer the reply to avoid timeout
@@ -26,6 +26,7 @@ module.exports = {
             const message = interaction.options._hoistedOptions[0].value;
             // Call GetStats passing interaction and message as arguments
             await GetStats(interaction, message);
+            await interaction.followUp({ content: 'Your Stats:' });
         } catch (error) {
             console.error('Error getting stats:', error);
             await interaction.followUp({ content: 'An error occurred while fetching stats.' });
@@ -83,7 +84,29 @@ async function GetStats(interaction: any, message: string) {
     let surrRate = await CalSurrRates(matches);
     let avgMinionsKilled = await AvgMinionsKilled(matches);
     let avgGoldEarned = await AvgGoldEarned(matches);
+    let avgDurationOfGame = await AvgDurationOfGame(matches);
+    let avgKillsGame = await AvgKillsGame(matches);
+    let avgDeathsGame = await AvgDeathsGame(matches);
+    let totaPentas = await TotaPentas(matches);
+    let totaQuadrs = await TotaQuadrs(matches);
+    let tripleKills = await TripleKills(matches);
 
-    // Send the stats as a message
-    await interaction.followUp({ content: `${type}\nWin rate: ${winRate}\nVision Avg: ${visionAvg}\nAvg Damage Dealt to Champs: ${champDamage}\nSurrenders: ${surrRate}\nAvg Minions Killed: ${avgMinionsKilled}\nAvg Gold Earned: ${avgGoldEarned}\nIn ${matches.length} games` });
+
+    console.log("win rate: ", winRate);
+    return interaction.channel.send({
+        content: `${type} 
+    win rate:  ${winRate}
+    Vision Avg: ${visionAvg}
+    Avg Damage Dealt to Champs: ${champDamage}
+    Surrenders: ${surrRate}
+    Avg Minions Killed: ${avgMinionsKilled}
+    Avg Gold Earned: ${avgGoldEarned}
+    Avg Time Spent: ${avgDurationOfGame / 60000}
+    Avg Kills: ${avgKillsGame}
+    Avg Deaths: ${avgDeathsGame}
+    Total Pentas Kills: ${totaPentas}
+    Total Quadra Kills: ${totaQuadrs}
+    Total Triple Kills: ${tripleKills}
+    in ${matches?.length} games`
+    });
 }
