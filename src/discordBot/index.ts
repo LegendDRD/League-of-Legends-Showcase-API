@@ -3,21 +3,57 @@ import { checkForuserDiscord, createUser, getLast20MatchesbyUuid, getQueue } fro
 import { getUUIDBasedOnGameName, stroreMatchData } from "../utils/lol_api";
 import { UserLink, participantsWithmatchAndQueue } from "../interfaces/InterfaceAndTypes";
 import { AvgDamageDealtTochampions, AvgGoldEarned, AvgMinionsKilled, CalSurrRates, CalVisionRates, CalWinRates } from "../utils/lolStats";
-
-const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST } = require('discord.js');
+import fs from 'node:fs';
+import path from 'node:path';
+const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST, Collection, Events } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-const commands = [
-    {
-        name: "help",
-        description: "Shows list of commands"
-    }];
-
 
 const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN)
-
+const commands: any[] = [];
 export async function StartBot() {
 
     client.login(process.env.CLIENT_TOKEN);
+
+    client.commands = new Collection();
+
+    const foldersPath = path.join(__dirname, 'commands');
+    const commandFolders = fs.readdirSync(foldersPath);
+
+    for (const folder of commandFolders) {
+
+        const commandsPath = path.join(foldersPath, folder);
+        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
+
+        for (const file of commandFiles) {
+            const filePath = path.join(commandsPath, file);
+            const command = require(filePath);
+
+
+            if ('data' in command && 'execute' in command) {
+                console.log(`setting ${command.data.name}`)
+                client.commands.set(command.data.name, command);
+                commands.push(command.data.toJSON());
+            } else {
+                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+            }
+        }
+    }
+
+
+    try {
+        console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+        // The put method is used to fully refresh all commands in the guild with the current set
+        const data = await rest.put(
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+            { body: commands },
+        );
+
+        console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+    } catch (error) {
+        // And of course, make sure you catch and log any errors!
+        console.error(error);
+    }
 }
 
 const listOfGuildsReg: any = []
@@ -51,8 +87,30 @@ client.on('messageCreate', (msgData: any) => {
                 HelpCommand(msgData)
                 break;
             case "update":
-                UpdateMatches(msgData, message)
+                UpdateMatches(msgData)
                 break;
+        }
+    }
+});
+
+client.on(Events.InteractionCreate, async (interaction: any) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    const command = interaction.client.commands.get(interaction.commandName);
+
+    if (!command) {
+        console.error(`No command matching ${interaction.commandName} was found.`);
+        return;
+    }
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+        } else {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
     }
 });
@@ -162,7 +220,7 @@ async function GetStats(msgData: any, message: string) {
     return msgData.channel.send({ content: `${type} \nwin rate:  ${winRate}\nVision Avg: ${visionAvg}\nAvg Damage Dealt to Champs: ${champDamage}\nSurrenders: ${surrRate}\nAvg Minions Killed: ${avgMinionsKilled}\nAvg Gold Earned: ${avgGoldEarned}\nin ${matches?.length} games` });
 }
 
-async function UpdateMatches(msgData: any, message: string) {
+async function UpdateMatches(msgData: any) {
     msgData.channel.send({ content: "Just a sec" });
     let discord_user_id = msgData.author.id
 
@@ -179,20 +237,5 @@ async function UpdateMatches(msgData: any, message: string) {
         return msgData.channel.send({ content: "User Data Updated" });
     }
     return msgData.channel.send({ content: "An Error Occured" });
-}
-
-async function RegCommandsOnServer(msg: any) {
-    // if (listOfGuildsReg.find((id: number) => { msg.guildId !== id })) {
-    try {
-        console.log('Registering commands');
-
-        await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_TOKEN, msg.guildId), { body: commands })
-
-        console.log('commands Reg Succ');
-    } catch (error) {
-        console.log(error);
-    }
-    listOfGuildsReg.push(msg.guildId)
-    // }
 }
 
