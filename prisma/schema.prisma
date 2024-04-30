@@ -17,8 +17,8 @@ model champions {
 model matches {
   id                   Int            @id @default(autoincrement()) @db.UnsignedInt
   match_id             String         @unique @db.VarChar(50)
-  game_start_timestamp String         @db.VarChar(50)
-  game_end_timestamp   String         @db.VarChar(50)
+  game_start_timestamp BigInt
+  game_end_timestamp   BigInt
   queue_id             String         @db.VarChar(50)
   queue                queue_types?   @relation(fields: [queue_id], references: [queue_id])
   participants         participants[]
@@ -97,23 +97,28 @@ model participants {
 }
 
 model users {
-  id              Int            @id @default(autoincrement()) @db.UnsignedInt
-  uuid            String?        @unique @db.VarChar(100)
-  game_name       String?        @db.VarChar(50)
-  tag_line        String?        @db.VarChar(50)
-  discord_user_id String?        @db.VarChar(50)
+  id              Int              @id @default(autoincrement()) @db.UnsignedInt
+  uuid            String?          @unique @db.VarChar(100)
+  game_name       String?          @db.VarChar(50)
+  tag_line        String?          @db.VarChar(50)
+  discord_user_id String?          @db.VarChar(50)
   participants    participants[]
+  users_discords  users_discords[]
 }
 
 model discords {
-  id         Int    @id @default(autoincrement()) @db.UnsignedInt
-  discord_id String @unique(map: "discord_id") @db.VarChar(50)
+  id             Int              @id @default(autoincrement()) @db.UnsignedInt
+  discord_id     String           @unique(map: "discord_id") @db.VarChar(50)
+  users_discords users_discords[]
 }
 
 model users_discords {
   id         Int @id @default(autoincrement()) @db.UnsignedInt
   user_id    Int @db.UnsignedInt
   discord_id Int @db.UnsignedInt
+
+  user    users?    @relation(fields: [user_id], references: [id])
+  discord discords? @relation(fields: [discord_id], references: [id])
 }
 
 model queue_types {

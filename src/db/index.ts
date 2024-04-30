@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import { PrismaClient, users, participants, matches } from '@prisma/client'
 import { match } from 'assert';
 import { UserLink } from '../interfaces/InterfaceAndTypes';
+import { User } from 'discord.js';
+import { time } from 'console';
 const prisma = new PrismaClient()
 
 
@@ -197,17 +199,36 @@ export async function getLast20MatchesbyUuid(user: users, queueId: string) {
     return results
 }
 
-export async function getQueue(name: string) {
-    const found = await prisma.queue_types.findFirst({
+export async function getUsersFromDiscordId(id: number) {
+    const results = await prisma.users_discords.findMany({
         where: {
+            discord_id: id
+        },
+        include: {
+            user: true
+        }
+    })
 
+    return results
+
+}
+
+export async function getMatchesFromMili(timeStamp: number, user: any) {
+    console.log('timeStamp', timeStamp, user.uuid)
+    const found = await prisma.participants.findMany({
+        include: {
+            match: true
+        },
+        where: {
+            uuid: user.uuid,
+            match: {
+                game_start_timestamp: {
+                    gte: timeStamp
+                }
+            }
         }
     });
 
-    if (found !== null) {
-        return found;
-    } else {
-        return false;
-    }
+    return found
 
 }
