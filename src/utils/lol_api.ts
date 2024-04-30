@@ -128,9 +128,9 @@ export async function stroreMatchData(uuid: string) {
                 }
             }
         }
-
+        return true
     } catch (err: any) {
         console.log(err);
-        return null
+        return false
     }
 }

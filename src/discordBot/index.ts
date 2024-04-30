@@ -2,6 +2,7 @@ import { participants, matches, Prisma } from "@prisma/client";
 import { checkForuserDiscord, createUser, getLast20MatchesbyUuid, getQueue } from "../db";
 import { getUUIDBasedOnGameName, stroreMatchData } from "../utils/lol_api";
 import { UserLink, participantsWithmatchAndQueue } from "../interfaces/InterfaceAndTypes";
+import { AvgDamageDealtTochampions, AvgGoldEarned, AvgMinionsKilled, CalSurrRates, CalVisionRates, CalWinRates } from "../utils/lolStats";
 
 const { Client, GatewayIntentBits, EmbedBuilder, Routes, REST } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -140,7 +141,7 @@ async function GetStats(msgData: any, message: string) {
             queueId = "450";
             break;
         default:
-            type = "solo"
+            type = "normal"
             queueId = "400";
             break;
     }
@@ -153,8 +154,12 @@ async function GetStats(msgData: any, message: string) {
     }
     let winRate = await CalWinRates(matches);
     let visionAvg = await CalVisionRates(matches);
+    let champDamage = await AvgDamageDealtTochampions(matches);
+    let surrRate = await CalSurrRates(matches);
+    let avgMinionsKilled = await AvgMinionsKilled(matches);
+    let avgGoldEarned = await AvgGoldEarned(matches);
     console.log("win rate: ", winRate);
-    return msgData.channel.send({ content: `${type} \n win rate:  ${winRate}\n Vision Avg: ${visionAvg}\n in ${matches?.length} games ` });
+    return msgData.channel.send({ content: `${type} \nwin rate:  ${winRate}\nVision Avg: ${visionAvg}\nAvg Damage Dealt to Champs: ${champDamage}\nSurrenders: ${surrRate}\nAvg Minions Killed: ${avgMinionsKilled}\nAvg Gold Earned: ${avgGoldEarned}\nin ${matches?.length} games` });
 }
 
 async function UpdateMatches(msgData: any, message: string) {
@@ -169,8 +174,11 @@ async function UpdateMatches(msgData: any, message: string) {
         return
     }
 
-    await stroreMatchData(user.uuid)
-    return msgData.channel.send({ content: "User Data Updated" });
+    let stored = await stroreMatchData(user.uuid)
+    if (stored) {
+        return msgData.channel.send({ content: "User Data Updated" });
+    }
+    return msgData.channel.send({ content: "An Error Occured" });
 }
 
 async function RegCommandsOnServer(msg: any) {
@@ -188,39 +196,3 @@ async function RegCommandsOnServer(msg: any) {
     // }
 }
 
-async function CalWinRates(matches: participantsWithmatchAndQueue[]) {
-    let wins = 0;
-    let overAllWinRate = 0
-    if (matches.length < 1) {
-        return { overAllWinRate }
-    }
-
-    for (let i = 0; i < matches.length; i++) {
-        if (matches[i].win) {
-            wins++;
-        }
-    }
-
-    overAllWinRate = (wins / matches.length) * 100
-
-    return overAllWinRate
-}
-
-async function CalVisionRates(matches: participantsWithmatchAndQueue[]) {
-    let visionTotal = 0;
-    let visionAvg = 0
-    if (matches.length < 1) {
-        return visionAvg
-    }
-
-    for (let i = 0; i < matches.length; i++) {
-        let element = matches[i]
-        if (element.vision_score !== null) {
-            visionTotal += element.vision_score;
-        }
-    }
-
-    visionAvg = (visionTotal / matches.length)
-
-    return visionAvg
-}
