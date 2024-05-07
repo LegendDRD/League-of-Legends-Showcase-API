@@ -209,6 +209,36 @@ export async function getLast20MatchesbyUuid(user: users, queueId: string) {
     return results
 }
 
+export async function getAllLast20MatchesbyUuid(user: users) {
+
+    if (user.uuid === null) {
+        console.log('No uuid found')
+        return
+    }
+    //
+    const results = await prisma.participants.findMany({
+        where: {
+            uuid: user.uuid
+        },
+        include: {
+            match: {
+                include: {
+                    queue: true
+                }
+            }
+        },
+        orderBy: {
+            match: {
+                game_start_timestamp: 'desc',
+
+            }
+        },
+        take: 20
+    })
+
+    return results
+}
+
 export async function getUsersFromDiscordId(id: number) {
     const results = await prisma.users_discords.findMany({
         where: {

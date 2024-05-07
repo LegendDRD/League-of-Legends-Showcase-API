@@ -1,0 +1,13 @@
+@url = http://127.0.0.1:3004/v1
+@Dev=
+@devurl = ""
+@token=
+
+################################
+POST {{url}}/user/matchhistory
+Content-Type: application/json
+
+{
+    "userName":"波崎さん",
+    "tagLine":"DAWG"
+}
