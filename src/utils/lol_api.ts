@@ -62,6 +62,7 @@ export async function stroreMatchData(uuid: string) {
 
                     stroreParticipantDataToDB({
                         uuid: element.puuid,
+                        assists: element.assists,
                         match_id: matchData.metadata.matchId,
                         champion_name: element.championName,
                         champion_level: element.champLevel,

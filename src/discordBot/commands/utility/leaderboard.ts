@@ -1,9 +1,18 @@
-import { users } from "@prisma/client";
-import { checkForDiscord, checkForuserDiscord, getLast20MatchesbyUuid, getMatchesFromMili, getUsersFromDiscordId } from "../../../db";
-import { CalWinRates, CalVisionRates, AvgDamageDealtTochampions, CalSurrRates, AvgMinionsKilled, AvgGoldEarned, AvgDurationOfGame, AvgDeathsGame, AvgKillsGame, TotaPentas, TotaQuadrs, TripleKills } from "../../../utils/lolStats";
-import { stroreMatchData } from "../../../utils/lol_api";
+import { Message } from "discord.js";
+import { checkForDiscord, checkForDiscordById, getMatchesFromMili, getUsersFromDiscordId } from "../../../db";
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
-const { SlashCommandBuilder } = require('discord.js');
+let weights = {
+    kills: .2,
+    deaths: .2,
+    assists: .2,
+    firstBlood: .1,
+    win: .2,
+    vision_score: .01,
+    dragon_kills: .09
+
+
+}
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +24,7 @@ module.exports = {
         try {
             // Call GetStats passing interaction and message as arguments
             await GetStats(interaction);
-            await interaction.followUp({ content: 'The Current Leaderboard:' });
+
         } catch (error) {
             console.error('Error getting stats:', error);
             await interaction.followUp({ content: 'An error occurred while fetching stats.' });
@@ -24,12 +33,11 @@ module.exports = {
 };
 
 async function GetStats(interaction: any) {
-    // Extract user ID from interaction
-    console.log(interaction.guild.id)
     let discord_id = interaction.guild.id;
-
+    console.log(discord_id)
     // Fetch user info from the database
-    const discordInfo = await checkForDiscord(discord_id);
+    const discordInfo = await checkForDiscordById(discord_id);
+    console.log(discordInfo)
 
     if (!discordInfo) {
         console.log("Discord not found");
@@ -38,7 +46,6 @@ async function GetStats(interaction: any) {
     }
 
     const discordUsers = await getUsersFromDiscordId(discordInfo.id)
-    console.log(discordUsers);
     let startDate = getStartOfCurrentMonth();
 
     const Leaderboard = []
@@ -49,20 +56,54 @@ async function GetStats(interaction: any) {
         //TODO Calculate Score for each match and then produce a score for the month so far
         let MonthScore = 0;
         for (let j = 0; j < matchesThisMonth.length; j++) {
-            MonthScore++
 
+            let totalScorePerMatch = (matchesThisMonth[j].kills * weights.kills) +
+                (matchesThisMonth[j].deaths * -weights.deaths) +
+                (matchesThisMonth[j].assists * weights.assists) +
+                (matchesThisMonth[j].first_blood_kill ? 1 : 0 * weights.firstBlood) +
+                (matchesThisMonth[j].win ? 2 : 0 * -weights.win) +
+                (matchesThisMonth[j].vision_score * weights.vision_score) +
+                (matchesThisMonth[j].dragon_kills * weights.dragon_kills)
+
+            if (!matchesThisMonth[j].win && matchesThisMonth[j].game_ended_in_surrender) {
+                totalScorePerMatch = totalScorePerMatch * .5
+            }
+
+            MonthScore += (totalScorePerMatch / matchesThisMonth.length) * 100
         }
+
+
 
         Leaderboard.push({
             user: discordUsers[i].user?.game_name,
-            score: MonthScore
+            score: MonthScore,
+            hasntPlayed: matchesThisMonth.length < 1
         })
+
+
+
         console.log(Leaderboard)
     }
+    let sortedLB = Leaderboard.sort((a, b) => {
+        return b.score - a.score;
+    });
 
+    const embed = new EmbedBuilder()
+        .setColor('#0099ff')
+        .setTitle('Leaderboard')
+        .setTimestamp();
 
+    for (let i = 0; i < sortedLB.length; i++) {
+
+        embed.addFields({ name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`, value: `${Leaderboard[i].user} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)}`} ` })
+    }
+
+    // Send the embed message to the desired channel
+    // Assuming 'message' is the message object and 'channel' is the channel you want to send the embed to
+
+    interaction.followUp({ content: "Here you go, This is the current Leaderboard stats." });
     return interaction.channel.send({
-        content: `Sheeshh`
+        embeds: [embed]
     });
 }
 

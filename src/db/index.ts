@@ -81,6 +81,16 @@ export async function checkForDiscord(user: UserLink) {
     }
 
 }
+export async function checkForDiscordById(discord_id: any) {
+    const found = await prisma.discords.findFirst({ where: { discord_id: discord_id } });
+
+    if (found !== null) {
+        return found;
+    } else {
+        return false;
+    }
+
+}
 
 export async function checkForuser(user: UserLink) {
     const found = await prisma.users.findFirst({
@@ -209,6 +219,8 @@ export async function getUsersFromDiscordId(id: number) {
         }
     })
 
+    console.log("discord Users", results)
+
     return results
 
 }
@@ -224,7 +236,8 @@ export async function getMatchesFromMili(timeStamp: number, user: any) {
             match: {
                 game_start_timestamp: {
                     gte: timeStamp
-                }
+                },
+                queue_id: { in: ["420", "440"] }
             }
         }
     });

@@ -29,66 +29,67 @@ model participants {
   uuid                               String   @db.VarChar(100)
   match_id                           String   @db.VarChar(100)
   champion_name                      String?  @db.VarChar(100)
-  champion_level                     Int?
-  champion_experience                Int?
-  damage_dealt_to_buildings          Int?
-  damage_dealt_to_objectives         Int?
-  damage_dealt_to_turrets            Int?
-  damage_self_mitigated              Int?
-  deaths                             Int?
-  double_kills                       Int?
-  dragon_kills                       Int?
-  first_blood_assist                 Boolean?
-  first_blood_kill                   Boolean?
-  first_tower_assist                 Boolean?
-  first_tower_kill                   Boolean?
-  game_ended_in_surrender            Boolean?
-  gold_earned                        Int?
-  gold_spent                         Int?
-  individual_position                String?  @db.VarChar(50)
-  inhibitor_kills                    Int?
-  inhibitor_takedowns                Int?
-  killing_sprees                     Int?
-  kills                              Int?
-  lane                               String?  @db.VarChar(50)
-  largest_critical_strike            Int?
-  largest_killing_spree              Int?
-  largest_multikill                  Int?
-  longest_time_spent_living          Int?
-  magic_damage_dealt                 Int?
-  magic_damage_dealt_to_champions    Int?
-  magic_damage_taken                 Int?
-  neutral_minions_killed             Int?
-  penta_kills                        Int?
-  physical_damage_dealt              Int?
-  physical_damage_dealt_to_champions Int?
-  physical_damage_taken              Int?
-  quadra_kills                       Int?
-  lane_role                          String?  @db.VarChar(50)
-  team_position                      String?  @db.VarChar(50)
-  total_damage_dealt                 Int?
-  total_damage_dealt_to_champions    Int?
-  total_damageshielded_on_teammates  Int?
-  total_damage_taken                 Int?
-  total_heal                         Int?
-  total_heals_on_teammates           Int?
-  total_minions_killed               Int?
-  total_time_CC_dealt                Int?
-  total_units_healed                 Int?
-  triple_kills                       Int?
-  true_damage_dealt                  Int?
-  true_damage_dealt_to_champions     Int?
-  true_damage_taken                  Int?
-  turret_kills                       Int?
-  turret_takedowns                   Int?
-  turrets_lost                       Int?
-  unreal_kills                       Int?
-  vision_wards_bought_in_game        Int?
-  wards_killed                       Int?
-  wards_placed                       Int?
-  win                                Boolean?
-  summoner_id                        String?  @db.VarChar(100)
-  vision_score                       Int?
+  champion_level                     Int
+  champion_experience                Int
+  damage_dealt_to_buildings          Int
+  damage_dealt_to_objectives         Int
+  damage_dealt_to_turrets            Int
+  damage_self_mitigated              Int
+  deaths                             Int
+  assists                            Int
+  double_kills                       Int
+  dragon_kills                       Int
+  first_blood_assist                 Boolean
+  first_blood_kill                   Boolean
+  first_tower_assist                 Boolean
+  first_tower_kill                   Boolean
+  game_ended_in_surrender            Boolean
+  gold_earned                        Int
+  gold_spent                         Int
+  individual_position                String   @db.VarChar(50)
+  inhibitor_kills                    Int
+  inhibitor_takedowns                Int
+  killing_sprees                     Int
+  kills                              Int
+  lane                               String   @db.VarChar(50)
+  largest_critical_strike            Int
+  largest_killing_spree              Int
+  largest_multikill                  Int
+  longest_time_spent_living          Int
+  magic_damage_dealt                 Int
+  magic_damage_dealt_to_champions    Int
+  magic_damage_taken                 Int
+  neutral_minions_killed             Int
+  penta_kills                        Int
+  physical_damage_dealt              Int
+  physical_damage_dealt_to_champions Int
+  physical_damage_taken              Int
+  quadra_kills                       Int
+  lane_role                          String   @db.VarChar(50)
+  team_position                      String   @db.VarChar(50)
+  total_damage_dealt                 Int
+  total_damage_dealt_to_champions    Int
+  total_damageshielded_on_teammates  Int
+  total_damage_taken                 Int
+  total_heal                         Int
+  total_heals_on_teammates           Int
+  total_minions_killed               Int
+  total_time_CC_dealt                Int
+  total_units_healed                 Int
+  triple_kills                       Int
+  true_damage_dealt                  Int
+  true_damage_dealt_to_champions     Int
+  true_damage_taken                  Int
+  turret_kills                       Int
+  turret_takedowns                   Int
+  turrets_lost                       Int
+  unreal_kills                       Int
+  vision_wards_bought_in_game        Int
+  wards_killed                       Int
+  wards_placed                       Int
+  win                                Boolean
+  summoner_id                        String   @db.VarChar(100)
+  vision_score                       Int
   match                              matches? @relation(fields: [match_id], references: [match_id])
   user                               users?   @relation(fields: [uuid], references: [uuid])
 

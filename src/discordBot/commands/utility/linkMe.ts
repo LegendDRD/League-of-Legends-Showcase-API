@@ -1,5 +1,6 @@
-import { checkForuserDiscord, getLast20MatchesbyUuid, createUser } from "../../../db";
-import { getUUIDBasedOnGameName } from "../../../utils/lol_api";
+import { checkForuserDiscord, getLast20MatchesbyUuid, createUser, checkForDiscord, createDiscord } from "../../../db";
+import { UserLink } from "../../../interfaces/InterfaceAndTypes";
+import { getUUIDBasedOnGameName, stroreMatchData } from "../../../utils/lol_api";
 
 const { SlashCommandBuilder } = require('discord.js');
 
@@ -34,12 +35,19 @@ async function LinkMeCommand(interaction: any, username: string) {
         await interaction.followUp({ content: "Invalid League Name. Please provide your username and tag separated by '#'." });
         return;
     }
-
-    const userLink: any = {
+    console.log(interaction)
+    const userLink: UserLink = {
         game_name: game_name,
         tag_line: tag_line,
-        discord_user_id: interaction.user.id
+        discord_user_id: interaction.user.id,
+        discord_id: interaction.guildId
     };
+    const discordInfo = await checkForDiscord(userLink);
+
+    if (!discordInfo) {
+        console.log("Discord not found");
+        await createDiscord(userLink)
+    }
 
     // Get UUID based on game name
     const riotResults: any = await getUUIDBasedOnGameName(userLink);
@@ -54,6 +62,8 @@ async function LinkMeCommand(interaction: any, username: string) {
 
     // Create user in the database
     await createUser(userLink);
-
+    if (userLink.uuid) {
+        await stroreMatchData(userLink.uuid);
+    }
     await interaction.followUp({ content: "Your Discord account has been linked with your League of Legends account." });
 }
