@@ -64,7 +64,7 @@ async function GetStats(interaction: any, message: string) {
             queueId = "450";
             break;
         default:
-            type = "normal";
+            queueId = "normal";
             break;
     }
 

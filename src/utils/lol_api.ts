@@ -135,3 +135,16 @@ export async function stroreMatchData(uuid: string) {
         return false
     }
 }
+
+export async function getGetRankDataFromSummonerID(summonerId: string) {
+    try {
+        let results = await axios.get(`${process.env.LOL_URL_LEAGUE}/lol/league/v4/entries/by-summoner/${summonerId}`, {
+            headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
+        })
+        return results.data
+
+    } catch (err: any) {
+        console.log(err);
+        return null
+    }
+}

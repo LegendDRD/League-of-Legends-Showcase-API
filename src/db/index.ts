@@ -215,7 +215,7 @@ export async function getAllLast20MatchesbyUuid(user: users) {
         console.log('No uuid found')
         return
     }
-    //
+    console.log(user)
     const results = await prisma.participants.findMany({
         where: {
             uuid: user.uuid
@@ -230,6 +230,7 @@ export async function getAllLast20MatchesbyUuid(user: users) {
         orderBy: {
             match: {
                 game_start_timestamp: 'desc',
+
 
             }
         },

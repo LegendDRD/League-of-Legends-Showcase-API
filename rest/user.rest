@@ -11,3 +11,11 @@ Content-Type: application/json
     "userName":"波崎さん",
     "tagLine":"DAWG"
 }
+################################
+POST {{url}}/user/rankstats
+Content-Type: application/json
+
+{
+    "userName":"波崎さん",
+    "tagLine":"DAWG"
+}
