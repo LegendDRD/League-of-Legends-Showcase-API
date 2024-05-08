@@ -139,7 +139,7 @@ export async function checkForLink(userDBData: any, discordDBData: any) {
 
 }
 
-export async function stroreMatchDataToDB(data: Omit<matches, 'id'>) {
+export async function storeMatchDataToDB(data: Omit<matches, 'id'>) {
     const matchData = await prisma.matches.create({
         data: data
     });
@@ -250,7 +250,7 @@ export async function getUsersFromDiscordId(id: number) {
         }
     })
 
-    console.log("discord Users", results)
+    // console.log("discord Users", results)
 
     return results
 

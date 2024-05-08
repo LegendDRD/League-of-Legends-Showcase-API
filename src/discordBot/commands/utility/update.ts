@@ -1,5 +1,6 @@
-import { checkForuserDiscord } from "../../../db";
-import { stroreMatchData } from "../../../utils/lol_api";
+import delay from "delay";
+import { checkForDiscordById, checkForuserDiscord, getUsersFromDiscordId } from "../../../db";
+import { storeMatchData } from "../../../utils/lol_api";
 
 const { SlashCommandBuilder } = require('discord.js');
 
@@ -24,20 +25,36 @@ async function UpdateMatches(interaction: any) {
     // Get the user ID from the interaction
     let discord_user_id = interaction.user.id;
 
-    // Check if user exists in the database
-    const user = await checkForuserDiscord(discord_user_id);
+    let discordId = interaction.guild.id
 
-    if (!user || !user.uuid) {
-        console.log("User Not Found");
-        await interaction.followUp({ content: "User not found." });
+    const discordInfo = await checkForDiscordById(discordId);
+
+    if (!discordInfo) {
+        console.log("Discord not found");
+        await interaction.followUp({ content: "Discord not found." });
         return;
     }
 
-    // Store match data
-    let stored = await stroreMatchData(user.uuid);
-    if (stored) {
-        await interaction.followUp({ content: "User data updated successfully." });
-    } else {
-        await interaction.followUp({ content: "An error occurred while updating user data." });
+    const discordUsers = await getUsersFromDiscordId(discordInfo.id)
+    await interaction.followUp({ content: "Lol Matches Will Update Slowly." });
+    for (let i = 0; i < discordUsers.length; i++) {
+
+        let discordUser: any = discordUsers[i].user?.discord_user_id;
+        if (discordUser) {
+
+            const user = await checkForuserDiscord(discordUser);
+
+            if (user && user.uuid) {
+                // Store match data
+                console.log(user.game_name)
+
+                let stored = await storeMatchData(user.uuid);
+            }
+        }
+
     }
+
+
+    await interaction.followUp({ content: "Lol Matches data updated successfully." });
+
 }

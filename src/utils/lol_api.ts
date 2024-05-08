@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { checkForMatch, stroreMatchDataToDB, stroreParticipantDataToDB } from '../db';
+import { checkForMatch, storeMatchDataToDB, stroreParticipantDataToDB } from '../db';
 import { UserLink } from '../interfaces/InterfaceAndTypes';
+import delay from 'delay';
 export async function getUUIDBasedOnGameName(userRequest: UserLink) {
     try {
         let results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.game_name}/${userRequest.tag_line}`, {
@@ -29,6 +30,20 @@ export async function getGetMatchesFromUUID(uuid: string) {
     }
 }
 
+export async function getGet20MatchesFromUUID(uuid: string) {
+    try {
+        let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20`, {
+            headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
+        })
+
+        return results.data
+
+    } catch (err: any) {
+        console.log(err);
+        return null
+    }
+}
+
 export async function getGetMatchDataFromMatchID(matchId: string) {
     try {
         let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/${matchId}`, {
@@ -42,16 +57,20 @@ export async function getGetMatchDataFromMatchID(matchId: string) {
     }
 }
 
-export async function stroreMatchData(uuid: string) {
+export async function storeMatchData(uuid: string) {
     try {
         let matchIdArray = await getGetMatchesFromUUID(uuid)
 
         for (let i = 0; i < matchIdArray.length; i++) {
             const element = matchIdArray[i];
-            let matchData = await getGetMatchDataFromMatchID(element)
+            console.log('getting Match', element)
             let found = await checkForMatch(element)
+
+
             if (!found) {
-                stroreMatchDataToDB({
+                await delay(1000);
+                let matchData = await getGetMatchDataFromMatchID(element)
+                await storeMatchDataToDB({
                     match_id: matchData.metadata.matchId,
                     queue_id: matchData.info.queueId.toString(),
                     game_start_timestamp: matchData.info.gameStartTimestamp.toString(),
@@ -60,7 +79,7 @@ export async function stroreMatchData(uuid: string) {
                 for (let j = 0; j < matchData.info.participants.length; j++) {
                     const element = matchData.info.participants[j];
 
-                    stroreParticipantDataToDB({
+                    await stroreParticipantDataToDB({
                         uuid: element.puuid,
                         assists: element.assists,
                         match_id: matchData.metadata.matchId,
@@ -129,9 +148,11 @@ export async function stroreMatchData(uuid: string) {
                 }
             }
         }
+        console.log('getting Matches Done')
         return true
     } catch (err: any) {
-        console.log(err);
+        // console.log(err);
+        console.log(err.status);
         return false
     }
 }
