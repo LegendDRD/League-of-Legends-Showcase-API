@@ -26,7 +26,7 @@ module.exports = {
             const message = interaction.options._hoistedOptions[0].value;
             // Call GetStats passing interaction and message as arguments
             await GetStats(interaction, message);
-            await interaction.followUp({ content: 'Your Stats:' });
+            await interaction.followUp({ content: `Your Stats: ${message.user.username}` });
         } catch (error) {
             console.error('Error getting stats:', error);
             await interaction.followUp({ content: 'An error occurred while fetching stats.' });
@@ -94,16 +94,16 @@ async function GetStats(interaction: any, message: string) {
 
     console.log("win rate: ", winRate);
     return interaction.channel.send({
-        content: `${type}
+        content: `${type} - ${interaction.user.username}
     win rate:  ${winRate}
-    Vision Avg: ${visionAvg}
-    Avg Damage Dealt to Champs: ${champDamage}
-    Surrenders: ${surrRate}
-    Avg Minions Killed: ${avgMinionsKilled}
-    Avg Gold Earned: ${avgGoldEarned}
-    Avg Time Spent: ${avgDurationOfGame / 60000}
-    Avg Kills: ${avgKillsGame}
-    Avg Deaths: ${avgDeathsGame}
+    Vision Avg: ${visionAvg.toFixed(2)}
+    Avg Damage Dealt to Champs: ${champDamage.toFixed(2)}
+    Surrenders: ${surrRate.toFixed(2)}
+    Avg Minions Killed: ${avgMinionsKilled.toFixed(2)}
+    Avg Gold Earned: ${avgGoldEarned.toFixed(2)}
+    Avg Time Spent: ${(avgDurationOfGame / 60000).toFixed(2)}
+    Avg Kills: ${avgKillsGame.toFixed(2)}
+    Avg Deaths: ${avgDeathsGame.toFixed(2)}
     Total Pentas Kills: ${totaPentas}
     Total Quadra Kills: ${totaQuadrs}
     Total Triple Kills: ${tripleKills}

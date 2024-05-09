@@ -15,7 +15,7 @@ export async function CalWinRates(matches: participantsWithmatchAndQueue[]) {
 
     overAllWinRate = (wins / matches.length) * 100
 
-    return overAllWinRate
+    return overAllWinRate.toFixed(2)
 }
 
 export async function CalSurrRates(matches: participantsWithmatchAndQueue[]) {
