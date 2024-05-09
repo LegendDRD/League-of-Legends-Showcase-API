@@ -1,5 +1,5 @@
 import delay from "delay";
-import { checkForDiscordById, checkForuserDiscord, getUsersFromDiscordId } from "../../../db";
+import { checkForDiscordById, checkForuserDiscord, deleteOldMatchesAndParticipants, getUsersFromDiscordId } from "../../../db";
 import { storeMatchData } from "../../../utils/lol_api";
 
 const { SlashCommandBuilder } = require('discord.js');
@@ -22,8 +22,6 @@ module.exports = {
 };
 
 async function UpdateMatches(interaction: any) {
-    // Get the user ID from the interaction
-    const discord_user_id = interaction.user.id;
 
     const discordId = interaction.guild.id
 
@@ -37,6 +35,7 @@ async function UpdateMatches(interaction: any) {
 
     const discordUsers = await getUsersFromDiscordId(discordInfo.id)
     await interaction.followUp({ content: "Lol Matches Will Update Slowly." });
+
     for (let i = 0; i < discordUsers.length; i++) {
 
         const discordUser: any = discordUsers[i].user?.discord_user_id;
@@ -48,13 +47,14 @@ async function UpdateMatches(interaction: any) {
                 // Store match data
                 console.log(user.game_name)
 
-                const stored = await storeMatchData(user.uuid);
+                await storeMatchData(user.uuid);
             }
         }
 
     }
 
-
+    deleteOldMatchesAndParticipants();
     await interaction.followUp({ content: "Lol Matches data updated successfully." });
 
 }
+

@@ -151,7 +151,7 @@ export async function storeMatchDataToDB(data: Omit<matches, 'id'>) {
     }
 }
 
-export async function stroreParticipantDataToDB(data: Omit<participants, 'id'>) {
+export async function storeParticipantDataToDB(data: Omit<participants, 'id'>) {
     const matchData = await prisma.participants.create({
         data
     });
@@ -274,5 +274,38 @@ export async function getMatchesFromMili(timeStamp: number, user: any) {
     });
 
     return found
+
+}
+
+export async function deleteOldMatchesAndParticipants() {
+    // Calculate the date that was 2 months ago
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    const twoMonthsAgoTimestamp = twoMonthsAgo.getTime();
+    // Find and delete matches older than two months
+    const oldMatches = await prisma.matches.findMany({
+        where: {
+
+            game_start_timestamp: { lt: twoMonthsAgoTimestamp }
+
+        }
+    });
+    console.log(oldMatches)
+    for (let i = 0; i < oldMatches.length; i++) {
+        await prisma.matches.deleteMany({
+            where: { match_id: oldMatches[i].match_id }
+        })
+    }
+
+
+    await prisma.matches.deleteMany({
+        where: {
+
+            game_start_timestamp: { lt: twoMonthsAgoTimestamp }
+
+        }
+    });
+
+    console.log(`Deleted ${oldMatches.length} matches older than 2 months.`);
 
 }

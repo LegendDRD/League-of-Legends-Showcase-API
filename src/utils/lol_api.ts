@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { checkForMatch, storeMatchDataToDB, stroreParticipantDataToDB } from '../db';
+import { checkForMatch, storeMatchDataToDB, storeParticipantDataToDB } from '../db';
 import { UserLink } from '../interfaces/InterfaceAndTypes';
 import delay from 'delay';
 export async function getUUIDBasedOnGameName(userRequest: UserLink) {
@@ -32,7 +32,8 @@ export async function getGetMatchesFromUUID(uuid: string) {
 
 export async function getGet20MatchesFromUUID(uuid: string) {
     try {
-        const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20`, {
+        const startDate = getStartOfCurrentMonth();
+        const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20&startTime=${startDate}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
 
@@ -79,7 +80,7 @@ export async function storeMatchData(uuid: string) {
                 for (let j = 0; j < matchData.info.participants.length; j++) {
                     const element = matchData.info.participants[j];
 
-                    await stroreParticipantDataToDB({
+                    await storeParticipantDataToDB({
                         uuid: element.puuid,
                         assists: element.assists,
                         match_id: matchData.metadata.matchId,
@@ -168,4 +169,21 @@ export async function getGetRankDataFromSummonerID(summonerId: string) {
         console.log(err);
         return null
     }
+}
+
+function getStartOfCurrentMonth() {
+    // Get the current date
+    const currentDate = new Date();
+
+    // Set the date to the first day of the month
+    currentDate.setDate(1);
+
+    // Set the time to midnight (start of the day)
+    currentDate.setHours(0, 0, 0, 0);
+
+    // Get the milliseconds of the start of the month
+    const startOfMonthMilliseconds = currentDate.getTime();
+    // console.log("Milliseconds of the start of the month:", startOfMonthMilliseconds);
+    return startOfMonthMilliseconds
+
 }
