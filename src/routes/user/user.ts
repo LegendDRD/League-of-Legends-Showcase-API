@@ -136,7 +136,7 @@ userRoute.post('/rankstats', async (req, res) => {
     if (summonerId) {
 
         const lolData = await getGetRankDataFromSummonerID(summonerId);
-        console.log(lolData)
+        // console.log(lolData)
         lolData.forEach((rankResults: any) => {
 
             switch (rankResults.queueType) {

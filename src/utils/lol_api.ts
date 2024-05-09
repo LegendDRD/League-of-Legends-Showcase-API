@@ -7,7 +7,7 @@ export async function getUUIDBasedOnGameName(userRequest: UserLink) {
         const results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.game_name}/${userRequest.tag_line}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
-        console.log(results.data);
+        // console.log(results.data);
         return results.data
 
     } catch (err: any) {
@@ -19,7 +19,7 @@ export async function getUUIDBasedOnGameName(userRequest: UserLink) {
 export async function getGetMatchesFromUUID(uuid: string) {
     try {
         const startDate = getStartOfCurrentMonth();
-        console.log("Search Date ", startDate)
+        // console.log("Search Date ", startDate)
         const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=50&startTime=${startDate}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
@@ -35,7 +35,7 @@ export async function getGetMatchesFromUUID(uuid: string) {
 export async function getGet20MatchesFromUUID(uuid: string) {
     try {
         const startDate = getStartOfCurrentMonth();
-        console.log("Search Date ", startDate)
+        // console.log("Search Date ", startDate)
         const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20&startTime=${startDate}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
@@ -67,11 +67,11 @@ export async function storeMatchData(uuid: string) {
         await delay(200);
         for (let i = 0; i < matchIdArray.length; i++) {
             const matchId = matchIdArray[i];
-            console.log('getting Match', matchId)
             const found = await checkForMatch(matchId)
 
 
             if (!found) {
+                console.log('getting Match', matchId)
                 await delay(2000);
                 const matchData = await getGetMatchDataFromMatchID(matchId)
                 await storeMatchDataToDB({
@@ -152,7 +152,7 @@ export async function storeMatchData(uuid: string) {
                 }
             }
         }
-        console.log('getting Matches Done')
+        // console.log('getting Matches Done')
         return true
     } catch (err: any) {
         // console.log(err);

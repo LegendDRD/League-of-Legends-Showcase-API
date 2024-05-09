@@ -215,7 +215,7 @@ export async function getAllLast20MatchesbyUuid(user: users) {
         console.log('No uuid found')
         return
     }
-    console.log(user)
+    // console.log(user)
     const results = await prisma.participants.findMany({
         where: {
             uuid: user.uuid
@@ -257,7 +257,7 @@ export async function getUsersFromDiscordId(id: number) {
 }
 
 export async function getMatchesFromMili(timeStamp: number, user: any) {
-    console.log('timeStamp', timeStamp, user.uuid)
+    // console.log('timeStamp', timeStamp, user.uuid)
     const found = await prisma.participants.findMany({
         include: {
             match: true
@@ -290,7 +290,7 @@ export async function deleteOldMatchesAndParticipants() {
 
         }
     });
-    console.log(oldMatches)
+    // console.log(oldMatches)
     for (let i = 0; i < oldMatches.length; i++) {
         await prisma.participants.deleteMany({
             where: { match_id: oldMatches[i].match_id }

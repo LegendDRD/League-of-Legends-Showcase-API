@@ -35,7 +35,7 @@ async function LinkMeCommand(interaction: any, username: string) {
         await interaction.followUp({ content: "Invalid League Name. Please provide your username and tag separated by '#'." });
         return;
     }
-    console.log(interaction)
+    // console.log(interaction)
     const userLink: UserLink = {
         game_name,
         tag_line,

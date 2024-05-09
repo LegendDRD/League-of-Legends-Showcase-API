@@ -8,7 +8,7 @@ const commands: any[] = [];
 const prefix = "!"
 
 export async function StartBot() {
-    console.log("Starting", process.env.CLIENT_TOKEN)
+    // console.log("Starting", process.env.CLIENT_TOKEN)
     client.login(process.env.CLIENT_TOKEN);
 
     client.commands = new Collection();

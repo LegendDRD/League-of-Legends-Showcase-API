@@ -34,10 +34,10 @@ module.exports = {
 
 async function GetStats(interaction: any) {
     const discord_id = interaction.guild.id;
-    console.log(discord_id)
+    // console.log(discord_id)
     // Fetch user info from the database
     const discordInfo = await checkForDiscordById(discord_id);
-    console.log(discordInfo)
+    // console.log(discordInfo)
 
     if (!discordInfo) {
         console.log("Discord not found");
@@ -82,7 +82,7 @@ async function GetStats(interaction: any) {
 
 
 
-        console.log(Leaderboard)
+        // console.log(Leaderboard)
     }
     const sortedLB = Leaderboard.sort((a, b) => {
         return b.score - a.score;

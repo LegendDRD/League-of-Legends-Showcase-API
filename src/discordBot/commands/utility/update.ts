@@ -45,7 +45,7 @@ async function UpdateMatches(interaction: any) {
 
             if (user && user.uuid) {
                 // Store match data
-                console.log(user.game_name)
+                // console.log(user.game_name)
 
                 await storeMatchData(user.uuid);
             }
