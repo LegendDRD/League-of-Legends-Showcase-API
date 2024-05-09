@@ -187,6 +187,6 @@ function getStartOfCurrentMonth() {
     // Get the milliseconds of the start of the month
     const startOfMonthMilliseconds = currentDate.getTime();
     // console.log("Milliseconds of the start of the month:", startOfMonthMilliseconds);
-    return startOfMonthMilliseconds
+    return startOfMonthMilliseconds / 1000
 
 }
