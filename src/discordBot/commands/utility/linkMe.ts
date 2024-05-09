@@ -1,6 +1,6 @@
 import { checkForuserDiscord, getLast20MatchesbyUuid, createUser, checkForDiscord, createDiscord } from "../../../db";
 import { UserLink } from "../../../interfaces/InterfaceAndTypes";
-import { getUUIDBasedOnGameName, stroreMatchData } from "../../../utils/lol_api";
+import { getUUIDBasedOnGameName, storeMatchData } from "../../../utils/lol_api";
 
 const { SlashCommandBuilder } = require('discord.js');
 
@@ -37,8 +37,8 @@ async function LinkMeCommand(interaction: any, username: string) {
     }
     console.log(interaction)
     const userLink: UserLink = {
-        game_name: game_name,
-        tag_line: tag_line,
+        game_name,
+        tag_line,
         discord_user_id: interaction.user.id,
         discord_id: interaction.guildId
     };
@@ -63,7 +63,7 @@ async function LinkMeCommand(interaction: any, username: string) {
     // Create user in the database
     await createUser(userLink);
     if (userLink.uuid) {
-        await stroreMatchData(userLink.uuid);
+        await storeMatchData(userLink.uuid);
     }
     await interaction.followUp({ content: "Your Discord account has been linked with your League of Legends account." });
 }

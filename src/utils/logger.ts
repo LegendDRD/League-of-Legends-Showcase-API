@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { db } from '../db';
+// import { db } from '../db';
 // import {logEmail} from './emailer.js';
 
 // log function to replace console log as well being able to be configered in the env to email and write logs to the database
@@ -38,9 +38,10 @@ export function cLog(src: string, info: string, errorLevel: string = "debug", cL
 
 }
 export async function auditLog(userId: number, action: string) {
-    const user = await db.asyncPool(`SELECT * from users where id=?`, [userId]);
-    const results = await db
-        .asyncPool(`INSERT INTO audit (from_user, user_id, action) VALUES ('${user[0].name_first} ${user[0].name_last}','${userId}', '${action}')`, []);
+    console.log("audit")
+    // const user = await db.asyncPool(`SELECT * from users where id=?`, [userId]);
+    // const results = await db
+    // .asyncPool(`INSERT INTO audit (from_user, user_id, action) VALUES ('${user[0].name_first} ${user[0].name_last}','${userId}', '${action}')`, []);
 }
 
 function writeToFile(src: string, info: string, errorLevel: string = "debug") {

@@ -17,6 +17,8 @@
             true,
             "logs"
         ],
+        "variable-name":false,
+        "no-var-requires":false,
         "prefer-for-of": false,
         "forin": false
     },

@@ -38,7 +38,7 @@ export async function CalVisionRates(matches: participantsWithmatchAndQueue[]) {
     }
 
     for (let i = 0; i < matches.length; i++) {
-        let element = matches[i]
+        const element = matches[i]
         if (element.vision_score !== null) {
             visionTotal += element.vision_score;
         }
@@ -57,7 +57,7 @@ export async function AvgDamageDealtTochampions(matches: participantsWithmatchAn
     }
 
     for (let i = 0; i < matches.length; i++) {
-        let element = matches[i]
+        const element = matches[i]
         if (element.total_damage_dealt_to_champions !== null) {
             damageTotal += element.total_damage_dealt_to_champions;
         }
@@ -76,7 +76,7 @@ export async function AvgMinionsKilled(matches: participantsWithmatchAndQueue[])
     }
 
     for (let i = 0; i < matches.length; i++) {
-        let element = matches[i]
+        const element = matches[i]
         if (element.total_minions_killed !== null) {
             Total += element.total_minions_killed;
         }
@@ -95,7 +95,7 @@ export async function AvgGoldEarned(matches: participantsWithmatchAndQueue[]) {
     }
 
     for (let i = 0; i < matches.length; i++) {
-        let element = matches[i]
+        const element = matches[i]
         if (element.gold_earned !== null) {
             Total += element.gold_earned;
         }

@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { checkForDiscord, checkForDiscordById, getMatchesFromMili, getUsersFromDiscordId } from "../../../db";
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
-let weights = {
+const weights = {
     kills: .2,
     deaths: .2,
     assists: .2,
@@ -33,7 +33,7 @@ module.exports = {
 };
 
 async function GetStats(interaction: any) {
-    let discord_id = interaction.guild.id;
+    const discord_id = interaction.guild.id;
     console.log(discord_id)
     // Fetch user info from the database
     const discordInfo = await checkForDiscordById(discord_id);
@@ -46,14 +46,14 @@ async function GetStats(interaction: any) {
     }
 
     const discordUsers = await getUsersFromDiscordId(discordInfo.id)
-    let startDate = getStartOfCurrentMonth();
+    const startDate = getStartOfCurrentMonth();
 
     const Leaderboard = []
 
     for (let i = 0; i < discordUsers.length; i++) {
-        let matchesThisMonth = await getMatchesFromMili(startDate, discordUsers[i].user);
+        const matchesThisMonth = await getMatchesFromMili(startDate, discordUsers[i].user);
 
-        //TODO Calculate Score for each match and then produce a score for the month so far
+        // TODO Calculate Score for each match and then produce a score for the month so far
         let MonthScore = 0;
         for (let j = 0; j < matchesThisMonth.length; j++) {
 
@@ -84,7 +84,7 @@ async function GetStats(interaction: any) {
 
         console.log(Leaderboard)
     }
-    let sortedLB = Leaderboard.sort((a, b) => {
+    const sortedLB = Leaderboard.sort((a, b) => {
         return b.score - a.score;
     });
 

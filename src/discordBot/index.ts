@@ -5,10 +5,10 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 
 const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN)
 const commands: any[] = [];
-let prefix = "!"
+const prefix = "!"
 
 export async function StartBot() {
-
+    console.log("Starting", process.env.CLIENT_TOKEN)
     client.login(process.env.CLIENT_TOKEN);
 
     client.commands = new Collection();
@@ -19,7 +19,7 @@ export async function StartBot() {
     for (const folder of commandFolders) {
 
         const commandsPath = path.join(foldersPath, folder);
-        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
+        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
         for (const file of commandFiles) {
             const filePath = path.join(commandsPath, file);
@@ -60,13 +60,13 @@ client.on('ready', () => {
 
 client.on('messageCreate', (msgData: any) => {
 
-    let message = msgData.content
+    const message = msgData.content
     if (message.substring(0, 1) === prefix) {
         const command = message.slice(prefix.length).split(' ')[0]
 
         switch (command) {
             case "help":
-                //TODO check and insert if new discord
+                // TODO check and insert if new discord
                 break;
 
         }

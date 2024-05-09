@@ -4,7 +4,7 @@ import { UserLink } from '../interfaces/InterfaceAndTypes';
 import delay from 'delay';
 export async function getUUIDBasedOnGameName(userRequest: UserLink) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.game_name}/${userRequest.tag_line}`, {
+        const results = await axios.get(`${process.env.LOL_URL}/riot/account/v1/accounts/by-riot-id/${userRequest.game_name}/${userRequest.tag_line}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
         console.log(results.data);
@@ -18,7 +18,7 @@ export async function getUUIDBasedOnGameName(userRequest: UserLink) {
 
 export async function getGetMatchesFromUUID(uuid: string) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=50`, {
+        const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=50`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
 
@@ -32,7 +32,7 @@ export async function getGetMatchesFromUUID(uuid: string) {
 
 export async function getGet20MatchesFromUUID(uuid: string) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20`, {
+        const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
 
@@ -46,7 +46,7 @@ export async function getGet20MatchesFromUUID(uuid: string) {
 
 export async function getGetMatchDataFromMatchID(matchId: string) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/${matchId}`, {
+        const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/${matchId}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
         return results.data
@@ -59,17 +59,17 @@ export async function getGetMatchDataFromMatchID(matchId: string) {
 
 export async function storeMatchData(uuid: string) {
     try {
-        let matchIdArray = await getGetMatchesFromUUID(uuid)
+        const matchIdArray = await getGetMatchesFromUUID(uuid)
 
         for (let i = 0; i < matchIdArray.length; i++) {
             const element = matchIdArray[i];
             console.log('getting Match', element)
-            let found = await checkForMatch(element)
+            const found = await checkForMatch(element)
 
 
             if (!found) {
                 await delay(1000);
-                let matchData = await getGetMatchDataFromMatchID(element)
+                const matchData = await getGetMatchDataFromMatchID(element)
                 await storeMatchDataToDB({
                     match_id: matchData.metadata.matchId,
                     queue_id: matchData.info.queueId.toString(),
@@ -159,7 +159,7 @@ export async function storeMatchData(uuid: string) {
 
 export async function getGetRankDataFromSummonerID(summonerId: string) {
     try {
-        let results = await axios.get(`${process.env.LOL_URL_LEAGUE}/lol/league/v4/entries/by-summoner/${summonerId}`, {
+        const results = await axios.get(`${process.env.LOL_URL_LEAGUE}/lol/league/v4/entries/by-summoner/${summonerId}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
         return results.data

@@ -23,9 +23,9 @@ module.exports = {
 
 async function UpdateMatches(interaction: any) {
     // Get the user ID from the interaction
-    let discord_user_id = interaction.user.id;
+    const discord_user_id = interaction.user.id;
 
-    let discordId = interaction.guild.id
+    const discordId = interaction.guild.id
 
     const discordInfo = await checkForDiscordById(discordId);
 
@@ -39,7 +39,7 @@ async function UpdateMatches(interaction: any) {
     await interaction.followUp({ content: "Lol Matches Will Update Slowly." });
     for (let i = 0; i < discordUsers.length; i++) {
 
-        let discordUser: any = discordUsers[i].user?.discord_user_id;
+        const discordUser: any = discordUsers[i].user?.discord_user_id;
         if (discordUser) {
 
             const user = await checkForuserDiscord(discordUser);
@@ -48,7 +48,7 @@ async function UpdateMatches(interaction: any) {
                 // Store match data
                 console.log(user.game_name)
 
-                let stored = await storeMatchData(user.uuid);
+                const stored = await storeMatchData(user.uuid);
             }
         }
 

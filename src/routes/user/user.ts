@@ -15,23 +15,23 @@ const prisma = new PrismaClient()
 
 
 userRoute.post('/matchhistory', async (req, res) => {
-    let userName = {
+    const userName = {
         game_name: req.body.userName,
         tag_line: req.body.tagLine,
         discord_user_id: "",
         discord_id: ""
     };
 
-    let userDBData: any = await checkForuser(userName)
+    const userDBData: any = await checkForuser(userName)
 
     if (!userDBData) {
         console.log('User Not found')
         return res.sendStatus(404)
     }
 
-    let matchHistory = await getAllLast20MatchesbyUuid(userDBData);
+    const matchHistory = await getAllLast20MatchesbyUuid(userDBData);
 
-    let newMatchData = []
+    const newMatchData = []
     if (!matchHistory) {
         return res.send({ message: "No matches found" })
     }
@@ -77,36 +77,36 @@ userRoute.post('/matchhistory', async (req, res) => {
 
 })
 userRoute.post('/rankstats', async (req, res) => {
-    let userName = {
+    const userName = {
         game_name: req.body.userName,
         tag_line: req.body.tagLine,
         discord_user_id: "",
         discord_id: ""
     };
 
-    let userDBData: any = await checkForuser(userName)
+    const userDBData: any = await checkForuser(userName)
 
     if (!userDBData) {
         console.log('User Not found')
         return res.sendStatus(404)
     }
 
-    let matchHistory = await getAllLast20MatchesbyUuid(userDBData);
+    const matchHistory = await getAllLast20MatchesbyUuid(userDBData);
 
     if (!matchHistory) {
         return res.send({ message: "No matches found" })
     }
     let summonerId;
-    let rankSoloWins = 0;
-    let rankSoloTotalMatches = 0;
+    const rankSoloWins = 0;
+    const rankSoloTotalMatches = 0;
 
-    let rankFlexWins = 0;
-    let rankFlexTotalMatches = 0;
+    const rankFlexWins = 0;
+    const rankFlexTotalMatches = 0;
 
     for (let i = 0; i < 1; i++) {
 
         summonerId = matchHistory[i].summoner_id
-        let queueType = "normal"; // Default queue ID for normal games
+        const queueType = "normal"; // Default queue ID for normal games
 
         // switch (matchHistory[i].match?.queue_id) {
         //     case "420":
@@ -129,13 +129,13 @@ userRoute.post('/rankstats', async (req, res) => {
         // }
     }
 
-    let rankData: any = {
+    const rankData: any = {
         flex: {},
         solo: {}
     }
     if (summonerId) {
 
-        let lolData = await getGetRankDataFromSummonerID(summonerId);
+        const lolData = await getGetRankDataFromSummonerID(summonerId);
         console.log(lolData)
         lolData.forEach((rankResults: any) => {
 

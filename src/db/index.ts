@@ -23,7 +23,7 @@ export async function createUser(user: UserLink) {
         userDBData = await createUserDB(user)
     }
 
-    let userToDiscordLink: any = await checkForLink(userDBData, discordDBData)
+    const userToDiscordLink: any = await checkForLink(userDBData, discordDBData)
 
     if (!userToDiscordLink) {
         console.log('CreatingLink')
@@ -82,7 +82,7 @@ export async function checkForDiscord(user: UserLink) {
 
 }
 export async function checkForDiscordById(discord_id: any) {
-    const found = await prisma.discords.findFirst({ where: { discord_id: discord_id } });
+    const found = await prisma.discords.findFirst({ where: { discord_id } });
 
     if (found !== null) {
         return found;
@@ -141,7 +141,7 @@ export async function checkForLink(userDBData: any, discordDBData: any) {
 
 export async function storeMatchDataToDB(data: Omit<matches, 'id'>) {
     const matchData = await prisma.matches.create({
-        data: data
+        data
     });
 
     if (matchData !== null) {

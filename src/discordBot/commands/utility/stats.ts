@@ -1,6 +1,6 @@
 import { checkForuserDiscord, getLast20MatchesbyUuid } from "../../../db";
 import { CalWinRates, CalVisionRates, AvgDamageDealtTochampions, CalSurrRates, AvgMinionsKilled, AvgGoldEarned, AvgDurationOfGame, AvgDeathsGame, AvgKillsGame, TotaPentas, TotaQuadrs, TripleKills } from "../../../utils/lolStats";
-import { stroreMatchData } from "../../../utils/lol_api";
+
 
 const { SlashCommandBuilder } = require('discord.js');
 
@@ -36,7 +36,7 @@ module.exports = {
 
 async function GetStats(interaction: any, message: string) {
     // Extract user ID from interaction
-    let discord_user_id = interaction.user.id;
+    const discord_user_id = interaction.user.id;
 
     // Fetch user info from the database
     const userInfo = await checkForuserDiscord(discord_user_id);
@@ -48,7 +48,7 @@ async function GetStats(interaction: any, message: string) {
     }
 
     // Determine queue type based on message
-    let type = message.toLowerCase();
+    const type = message.toLowerCase();
     let queueId = "400"; // Default queue ID for normal games
     switch (type) {
         case "solo":
@@ -78,23 +78,23 @@ async function GetStats(interaction: any, message: string) {
     }
 
     // Calculate stats
-    let winRate = await CalWinRates(matches);
-    let visionAvg = await CalVisionRates(matches);
-    let champDamage = await AvgDamageDealtTochampions(matches);
-    let surrRate = await CalSurrRates(matches);
-    let avgMinionsKilled = await AvgMinionsKilled(matches);
-    let avgGoldEarned = await AvgGoldEarned(matches);
-    let avgDurationOfGame = await AvgDurationOfGame(matches);
-    let avgKillsGame = await AvgKillsGame(matches);
-    let avgDeathsGame = await AvgDeathsGame(matches);
-    let totaPentas = await TotaPentas(matches);
-    let totaQuadrs = await TotaQuadrs(matches);
-    let tripleKills = await TripleKills(matches);
+    const winRate = await CalWinRates(matches);
+    const visionAvg = await CalVisionRates(matches);
+    const champDamage = await AvgDamageDealtTochampions(matches);
+    const surrRate = await CalSurrRates(matches);
+    const avgMinionsKilled = await AvgMinionsKilled(matches);
+    const avgGoldEarned = await AvgGoldEarned(matches);
+    const avgDurationOfGame = await AvgDurationOfGame(matches);
+    const avgKillsGame = await AvgKillsGame(matches);
+    const avgDeathsGame = await AvgDeathsGame(matches);
+    const totaPentas = await TotaPentas(matches);
+    const totaQuadrs = await TotaQuadrs(matches);
+    const tripleKills = await TripleKills(matches);
 
 
     console.log("win rate: ", winRate);
     return interaction.channel.send({
-        content: `${type} 
+        content: `${type}
     win rate:  ${winRate}
     Vision Avg: ${visionAvg}
     Avg Damage Dealt to Champs: ${champDamage}
