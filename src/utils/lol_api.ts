@@ -19,7 +19,7 @@ export async function getUUIDBasedOnGameName(userRequest: UserLink) {
 export async function getGetMatchesFromUUID(uuid: string) {
     try {
         const startDate = getStartOfCurrentMonth();
-
+        console.log("Search Date ", startDate)
         const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=50&startTime=${startDate}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
@@ -35,6 +35,7 @@ export async function getGetMatchesFromUUID(uuid: string) {
 export async function getGet20MatchesFromUUID(uuid: string) {
     try {
         const startDate = getStartOfCurrentMonth();
+        console.log("Search Date ", startDate)
         const results = await axios.get(`${process.env.LOL_URL}/lol/match/v5/matches/by-puuid/${uuid}/ids?count=20&startTime=${startDate}`, {
             headers: { 'X-Riot-Token': process.env.LOL_API_KEY }
         })
