@@ -62,14 +62,14 @@ export async function storeMatchData(uuid: string) {
         const matchIdArray = await getGetMatchesFromUUID(uuid)
 
         for (let i = 0; i < matchIdArray.length; i++) {
-            const element = matchIdArray[i];
-            console.log('getting Match', element)
-            const found = await checkForMatch(element)
+            const matchId = matchIdArray[i];
+            console.log('getting Match', matchId)
+            const found = await checkForMatch(matchId)
 
 
             if (!found) {
                 await delay(1000);
-                const matchData = await getGetMatchDataFromMatchID(element)
+                const matchData = await getGetMatchDataFromMatchID(matchId)
                 await storeMatchDataToDB({
                     match_id: matchData.metadata.matchId,
                     queue_id: matchData.info.queueId.toString(),
