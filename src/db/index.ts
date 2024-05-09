@@ -292,11 +292,10 @@ export async function deleteOldMatchesAndParticipants() {
     });
     console.log(oldMatches)
     for (let i = 0; i < oldMatches.length; i++) {
-        await prisma.matches.deleteMany({
+        await prisma.participants.deleteMany({
             where: { match_id: oldMatches[i].match_id }
         })
     }
-
 
     await prisma.matches.deleteMany({
         where: {
