@@ -26,7 +26,7 @@ module.exports = {
             const message = interaction.options._hoistedOptions[0].value;
             // Call GetStats passing interaction and message as arguments
             await GetStats(interaction, message);
-            await interaction.followUp({ content: `Your Stats: ${message.user.username}` });
+            await interaction.followUp({ content: `Your Stats: ` });
         } catch (error) {
             console.error('Error getting stats:', error);
             await interaction.followUp({ content: 'An error occurred while fetching stats.' });
@@ -94,7 +94,7 @@ async function GetStats(interaction: any, message: string) {
 
     console.log("win rate: ", winRate);
     return interaction.channel.send({
-        content: `${type} - ${interaction.user.username}
+        content: `${type.toLocaleUpperCase()} - ${interaction.user.username}
     win rate:  ${winRate}
     Vision Avg: ${visionAvg.toFixed(2)}
     Avg Damage Dealt to Champs: ${champDamage.toFixed(2)}
