@@ -101,8 +101,9 @@ async function GetStats(interaction: any) {
     // Send the embed message to the desired channel
     // Assuming 'message' is the message object and 'channel' is the channel you want to send the embed to
 
-    interaction.followUp({ content: "Here you go, This is the current Leaderboard stats." });
+    // interaction.channel.followUp({});
     return interaction.channel.send({
+        content: "Here you go, This is the current Leaderboard stats " + interaction.user.username,
         embeds: [embed]
     });
 }
