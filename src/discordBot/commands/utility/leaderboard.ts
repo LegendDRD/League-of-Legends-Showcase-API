@@ -15,28 +15,6 @@ const weights = {
 }
 // let previousLB: any = [];
 let previousLB: any = [
-    { user: 'Sancteezy', score: 405, hasntPlayed: false },
-    { user: 'Xnobiso', score: 378.0333333333333, hasntPlayed: false },
-    { user: 'Hasaki', score: 369.35, hasntPlayed: false },
-    { user: 'Saros', score: 305.625, hasntPlayed: false },
-    {
-        user: 'SpottedSnowman',
-        score: 281.62676056338023,
-        hasntPlayed: false
-    },
-    {
-        user: 'Known HighRoller',
-        score: 264.87037037037044,
-        hasntPlayed: false
-    },
-    { user: 'notSaros', score: 100.3783783783784, hasntPlayed: false },
-    {
-        user: 'DarkAlphaWolf20',
-        score: 219.96153846153845,
-        hasntPlayed: false
-    },
-    { user: 'Khenai', score: 0, hasntPlayed: true },
-    { user: 'RetroWarrior', score: 0, hasntPlayed: true },
 
 ];
 module.exports = {
@@ -128,9 +106,9 @@ async function GetStats(interaction: any) {
         if (previousLB.length > 0) {
             console.log(pos, i)
             if (i > pos) {
-                posText = "⌄"
+                posText = "▼"
             } else if (i < pos) {
-                posText = "^"
+                posText = "▲"
             }
         }
         embed.addFields({

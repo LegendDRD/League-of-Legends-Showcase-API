@@ -130,3 +130,10 @@ model queue_types {
   notes       String?   @db.VarChar(1024)
   matches     matches[]
 }
+
+model historical_leaderboards {
+  id                    BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  leaderboard_timestamp BigInt
+  discord_id            BigInt
+  leaderboard_data      String? @db.LongText()
+}
