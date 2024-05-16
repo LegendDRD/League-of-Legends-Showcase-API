@@ -13,7 +13,32 @@ const weights = {
 
 
 }
+// let previousLB: any = [];
+let previousLB: any = [
+    { user: 'Sancteezy', score: 405, hasntPlayed: false },
+    { user: 'Xnobiso', score: 378.0333333333333, hasntPlayed: false },
+    { user: 'Hasaki', score: 369.35, hasntPlayed: false },
+    { user: 'Saros', score: 305.625, hasntPlayed: false },
+    {
+        user: 'SpottedSnowman',
+        score: 281.62676056338023,
+        hasntPlayed: false
+    },
+    {
+        user: 'Known HighRoller',
+        score: 264.87037037037044,
+        hasntPlayed: false
+    },
+    { user: 'notSaros', score: 100.3783783783784, hasntPlayed: false },
+    {
+        user: 'DarkAlphaWolf20',
+        score: 219.96153846153845,
+        hasntPlayed: false
+    },
+    { user: 'Khenai', score: 0, hasntPlayed: true },
+    { user: 'RetroWarrior', score: 0, hasntPlayed: true },
 
+];
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('leaderboard')
@@ -48,7 +73,7 @@ async function GetStats(interaction: any) {
     const discordUsers = await getUsersFromDiscordId(discordInfo.id)
     const startDate = getStartOfCurrentMonth();
 
-    const Leaderboard = []
+    const Leaderboard: any = []
 
     for (let i = 0; i < discordUsers.length; i++) {
         const matchesThisMonth = await getMatchesFromMili(startDate, discordUsers[i].user);
@@ -84,7 +109,7 @@ async function GetStats(interaction: any) {
 
         // console.log(Leaderboard)
     }
-    const sortedLB = Leaderboard.sort((a, b) => {
+    const sortedLB = Leaderboard.sort((a: any, b: any) => {
         return b.score - a.score;
     });
 
@@ -94,14 +119,32 @@ async function GetStats(interaction: any) {
         .setTimestamp();
 
     for (let i = 0; i < sortedLB.length; i++) {
+        let pos: any = 999;
+        for (let j = 0; j < sortedLB.length; j++) {
+            pos = previousLB.findIndex((item: any) => item.user === Leaderboard[i].user);
 
-        embed.addFields({ name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`, value: `${Leaderboard[i].user} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)}`} ` })
+        }
+        let posText = ""
+        if (previousLB.length > 0) {
+            console.log(pos, i)
+            if (i > pos) {
+                posText = "⌄"
+            } else if (i < pos) {
+                posText = "^"
+            }
+        }
+        embed.addFields({
+            name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`,
+            value: `${Leaderboard[i].user} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)}`} ${posText} `
+        })
     }
 
     // Send the embed message to the desired channel
     // Assuming 'message' is the message object and 'channel' is the channel you want to send the embed to
 
     interaction.followUp({ content: "leaderboard Generated!!" });
+    previousLB = Leaderboard
+    console.log(previousLB)
     return interaction.channel.send({
         content: "Here you go, This is the current Leaderboard stats " + interaction.user.username,
         embeds: [embed]
