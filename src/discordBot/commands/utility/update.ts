@@ -34,7 +34,7 @@ async function UpdateMatches(interaction: any) {
     }
 
     const discordUsers = await getUsersFromDiscordId(discordInfo.id)
-    await interaction.followUp({ content: "Lol Matches Will Update Slowly." });
+    // await interaction.followUp({ content: "Lol Matches Will Update Slowly." });
 
     for (let i = 0; i < discordUsers.length; i++) {
 
@@ -54,7 +54,7 @@ async function UpdateMatches(interaction: any) {
     }
 
     deleteOldMatchesAndParticipants();
-    await interaction.followUp({ content: "Lol Matches data updated successfully." });
+    await interaction.followUp({ content: `Lol Matches data updated successfully. ${interaction.user.username}` });
 
 }
 
