@@ -1,6 +1,7 @@
-import { Message } from "discord.js";
-import { checkForDiscord, checkForDiscordById, getMatchesFromMili, getUsersFromDiscordId } from "../../../db";
+import { Colors, Message } from "discord.js";
+import { checkForDiscord, checkForDiscordById, checkForuserDiscord, deleteOldMatchesAndParticipants, getMatchesFromMili, getUsersFromDiscordId } from "../../../db";
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { storeMatchData } from "../../../utils/lol_api";
 
 const weights = {
     kills: .2,
@@ -13,10 +14,32 @@ const weights = {
 
 
 }
-// let previousLB: any = [];
-let previousLB: any = [
+let previousLB: any = [];
+// let previousLB: any = [
+//     { user: 'Sancteezy', score: 408, hasntPlayed: false },
+//     { user: 'Xnobiso', score: 378.0333333333333, hasntPlayed: false },
+//     { user: 'Hasaki', score: 369.35, hasntPlayed: false },
+//     { user: 'Saros', score: 3050000.625, hasntPlayed: false },
+//     {
+//         user: 'SpottedSnowman',
+//         score: 281.62676056338023,
+//         hasntPlayed: false
+//     },
+//     {
+//         user: 'Known HighRoller',
+//         score: 264.87037037037044,
+//         hasntPlayed: false
+//     },
+//     { user: 'notSaros', score: 100.3783783783784, hasntPlayed: false },
+//     {
+//         user: 'DarkAlphaWolf20',
+//         score: 219.96153846153845,
+//         hasntPlayed: false
+//     },
+//     { user: 'Khenai', score: 0, hasntPlayed: true },
+//     { user: 'RetroWarrior', score: 0, hasntPlayed: true },
 
-];
+// ];
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('leaderboard')
@@ -25,7 +48,41 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true }); // Defer the reply to avoid timeout
 
         try {
+
+            const discordId = interaction.guild.id
+
+            const discordInfo = await checkForDiscordById(discordId);
+
+            if (!discordInfo) {
+                console.log("Discord not found");
+                await interaction.followUp({ content: "Discord not found." });
+                return;
+            }
+
+            const discordUsers = await getUsersFromDiscordId(discordInfo.id)
+            interaction.followUp({ content: "Updating Users Matches... (Can take some time)" });
+
+            for (let i = 0; i < discordUsers.length; i++) {
+
+                const discordUser: any = discordUsers[i].user?.discord_user_id;
+                if (discordUser) {
+
+                    const user = await checkForuserDiscord(discordUser);
+
+                    if (user && user.uuid) {
+                        // Store match data
+                        // console.log(user.game_name)
+
+                        await storeMatchData(user.uuid);
+                    }
+                }
+
+            }
+
+            deleteOldMatchesAndParticipants();
             // Call GetStats passing interaction and message as arguments
+            interaction.followUp({ content: "Generating leaderboard" });
+
             await GetStats(interaction);
 
         } catch (error) {
@@ -98,9 +155,10 @@ async function GetStats(interaction: any) {
 
     for (let i = 0; i < sortedLB.length; i++) {
         let pos: any = 999;
+        let oldUserData;
         for (let j = 0; j < sortedLB.length; j++) {
             pos = previousLB.findIndex((item: any) => item.user === Leaderboard[i].user);
-
+            oldUserData = previousLB.find((item: any) => item.user === Leaderboard[i].user);
         }
         let posText = ""
         if (previousLB.length > 0) {
@@ -111,9 +169,21 @@ async function GetStats(interaction: any) {
                 posText = "▲"
             }
         }
+        let scoreDiff = 0
+        let scoreDiffTEXT = ""
+        if (oldUserData && previousLB.length > 0) {
+            scoreDiff = Leaderboard[i].score - oldUserData.score
+            if (scoreDiff > 0) {
+                scoreDiffTEXT = `(+${scoreDiff.toFixed(1)})`
+            } else if (scoreDiff === 0) {
+                scoreDiffTEXT = ``
+            } else {
+                scoreDiffTEXT = `(${scoreDiff.toFixed(1)})`
+            }
+        }
         embed.addFields({
             name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`,
-            value: `${Leaderboard[i].user} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)}`} ${posText} `
+            value: `${posText} ${Leaderboard[i].user} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`} `
         })
     }
 
