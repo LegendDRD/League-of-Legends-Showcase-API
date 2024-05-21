@@ -128,8 +128,13 @@ async function GetStats(interaction: any) {
             if (!matchesThisMonth[j].win && matchesThisMonth[j].game_ended_in_surrender) {
                 totalScorePerMatch = totalScorePerMatch * .5
             }
+            if (matchesThisMonth.length < 10) {
 
-            MonthScore += (totalScorePerMatch / matchesThisMonth.length) * 100
+                MonthScore += (totalScorePerMatch / 10) * 100
+            } else {
+
+                MonthScore += (totalScorePerMatch / matchesThisMonth.length) * 100
+            }
         }
 
 
@@ -137,7 +142,8 @@ async function GetStats(interaction: any) {
         Leaderboard.push({
             user: discordUsers[i].user?.game_name,
             score: MonthScore,
-            hasntPlayed: matchesThisMonth.length < 1
+            hasntPlayed: matchesThisMonth.length < 1,
+            gamesPlayed: matchesThisMonth.length
         })
 
 
@@ -183,7 +189,7 @@ async function GetStats(interaction: any) {
         }
         embed.addFields({
             name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`,
-            value: `${posText} ${Leaderboard[i].user} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`} `
+            value: `${posText} ${Leaderboard[i].user} - Games Played: ${Leaderboard[i].gamesPlayed} -  ${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`} `
         })
     }
 
