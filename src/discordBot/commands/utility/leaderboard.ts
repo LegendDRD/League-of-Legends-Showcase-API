@@ -189,7 +189,7 @@ async function GetStats(interaction: any) {
         }
         embed.addFields({
             name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`,
-            value: `${posText} ${Leaderboard[i].user} | NO. Games: ${Leaderboard[i].gamesPlayed} | ${Leaderboard[i].gamesPlayed > 0 ? `${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`}` : `In Placements ${Leaderboard[i].gamesPlayed}/10`} `
+            value: `${posText} ${Leaderboard[i].user} | NO. Games: ${Leaderboard[i].gamesPlayed} | ${Leaderboard[i].gamesPlayed > 9 ? `${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`}` : `In Placements ${Leaderboard[i].gamesPlayed}/10`} `
         })
     }
 
