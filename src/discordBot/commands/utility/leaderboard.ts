@@ -61,6 +61,10 @@ module.exports = {
 
             const discordUsers = await getUsersFromDiscordId(discordInfo.id)
             interaction.followUp({ content: "Updating Users Matches... (Can take some time)" });
+            interaction.channel.send({
+                content: `${interaction.user.username} is generating a leaderboard `,
+
+            });
 
             for (let i = 0; i < discordUsers.length; i++) {
 
@@ -80,8 +84,6 @@ module.exports = {
             }
 
             deleteOldMatchesAndParticipants();
-            // Call GetStats passing interaction and message as arguments
-            interaction.followUp({ content: "Generating leaderboard" });
 
             await GetStats(interaction);
 
