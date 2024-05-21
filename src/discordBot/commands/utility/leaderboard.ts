@@ -117,6 +117,7 @@ async function GetStats(interaction: any) {
 
         // TODO Calculate Score for each match and then produce a score for the month so far
         let MonthScore = 0;
+        let wins = 0
         for (let j = 0; j < matchesThisMonth.length; j++) {
 
             let totalScorePerMatch = (matchesThisMonth[j].kills * weights.kills) +
@@ -137,15 +138,19 @@ async function GetStats(interaction: any) {
 
                 MonthScore += (totalScorePerMatch / matchesThisMonth.length) * 100
             }
+            if (matchesThisMonth[j].win) {
+                wins++
+            }
         }
-
+        const winRate = wins / matchesThisMonth.length
 
 
         Leaderboard.push({
             user: discordUsers[i].user?.game_name,
             score: MonthScore,
             hasntPlayed: matchesThisMonth.length < 1,
-            gamesPlayed: matchesThisMonth.length
+            gamesPlayed: matchesThisMonth.length,
+            winRate
         })
 
 
@@ -191,7 +196,7 @@ async function GetStats(interaction: any) {
         }
         embed.addFields({
             name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`,
-            value: `${posText} ${Leaderboard[i].user} | NO. Games: ${Leaderboard[i].gamesPlayed} | ${Leaderboard[i].gamesPlayed > 9 ? `${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`}` : `In Placements ${Leaderboard[i].gamesPlayed}/10`} `
+            value: `${posText} ${Leaderboard[i].user} | ${Leaderboard[i].gamesPlayed > 9 ? `${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`}` : `In Placements ${Leaderboard[i].gamesPlayed}/10`} | NO. Games: ${Leaderboard[i].gamesPlayed} | ${Leaderboard[i].winRate.toFixed(2)}% `
         })
     }
 
