@@ -214,7 +214,7 @@ async function GetStats(interaction: any) {
 }
 
 async function GetStatsV2(interaction: any) {
-    //TODO Rework needed 
+    // TODO Rework needed
     const discord_id = interaction.guild.id;
     // console.log(discord_id)
     // Fetch user info from the database
@@ -296,10 +296,10 @@ async function GetStatsV2(interaction: any) {
             } else {
                 totalScorePerMatch = totalScorePerMatch * -.2
             }
-            if (discordUsers[i].user?.uuid === "BM70M3qwNSqO0rav8Q18Qtv6FOWzEZQIBPhbSfmR9skWZeLEmDcBqudkIZCPNFxlg-90Rb49k6Kfjg") {
+            // if (discordUsers[i].user?.uuid === "ofSnHkQl_CN2mRAUucVsml1biPuMWZ_Orn52qY3ixfwcCaAe5_HSF5ZNJ4iFa-C1X2OCUuhSnKkAag") {
 
-                console.log("preWinRate", preWinRate, "totalScorePerMatch", totalScorePerMatch)
-            }
+            //     console.log("preWinRate", preWinRate, "totalScorePerMatch", totalScorePerMatch)
+            // }
 
             MonthScore += totalScorePerMatch
             // if (matchesThisMonth.length < 5) {
@@ -326,10 +326,9 @@ async function GetStatsV2(interaction: any) {
             winRate
         })
 
-
-
-        console.log(Leaderboard)
+        // console.log(Leaderboard)
     }
+
     const sortedLB = Leaderboard.sort((a: any, b: any) => {
         return b.score - a.score;
     });
