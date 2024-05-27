@@ -62,7 +62,7 @@ module.exports = {
             const discordUsers = await getUsersFromDiscordId(discordInfo.id)
             interaction.followUp({ content: "Updating Users Matches... (Can take some time)" });
             interaction.channel.send({
-                content: `${interaction.user.username} is generating a leaderboard `,
+                content: `${interaction.user.username} is generating a leaderboard... `,
 
             });
 
@@ -85,7 +85,7 @@ module.exports = {
 
             deleteOldMatchesAndParticipants();
 
-            await GetStats(interaction);
+            await GetStatsV2(interaction);
 
         } catch (error) {
             console.error('Error getting stats:', error);
@@ -116,6 +116,7 @@ async function GetStats(interaction: any) {
         const matchesThisMonth = await getMatchesFromMili(startDate, discordUsers[i].user);
 
         // TODO Calculate Score for each match and then produce a score for the month so far
+
         let MonthScore = 0;
         let wins = 0
         for (let j = 0; j < matchesThisMonth.length; j++) {
@@ -156,6 +157,178 @@ async function GetStats(interaction: any) {
 
 
         // console.log(Leaderboard)
+    }
+    const sortedLB = Leaderboard.sort((a: any, b: any) => {
+        return b.score - a.score;
+    });
+
+    const embed = new EmbedBuilder()
+        .setColor('#0099ff')
+        .setTitle('Leaderboard')
+        .setTimestamp();
+
+    for (let i = 0; i < sortedLB.length; i++) {
+        let pos: any = 999;
+        let oldUserData;
+        for (let j = 0; j < sortedLB.length; j++) {
+            pos = previousLB.findIndex((item: any) => item.user === Leaderboard[i].user);
+            oldUserData = previousLB.find((item: any) => item.user === Leaderboard[i].user);
+        }
+        let posText = ""
+        if (previousLB.length > 0) {
+            console.log(pos, i)
+            if (i > pos) {
+                posText = "▼"
+            } else if (i < pos) {
+                posText = "▲"
+            }
+        }
+        let scoreDiff = 0
+        let scoreDiffTEXT = ""
+        if (oldUserData && previousLB.length > 0) {
+            scoreDiff = Leaderboard[i].score - oldUserData.score
+            if (scoreDiff > 0) {
+                scoreDiffTEXT = `(+${scoreDiff.toFixed(1)})`
+            } else if (scoreDiff === 0) {
+                scoreDiffTEXT = ``
+            } else {
+                scoreDiffTEXT = `(${scoreDiff.toFixed(1)})`
+            }
+        }
+        embed.addFields({
+            name: `${i + 1}${i + 1 < 4 ? i + 1 === 1 ? "st" : i + 1 === 2 ? "nd" : "rd" : "th"}`,
+            value: `${posText} ${Leaderboard[i].user} | ${Leaderboard[i].gamesPlayed > 9 ? `${Leaderboard[i].hasntPlayed ? "No Games Played This Month" : `Score: ${Math.floor(Leaderboard[i].score)} ${scoreDiffTEXT}`}` : `In Placements ${Leaderboard[i].gamesPlayed}/10`} | NO. Games: ${Leaderboard[i].gamesPlayed} | ${Leaderboard[i].winRate.toFixed(2) * 100}% `
+        })
+    }
+
+    // Send the embed message to the desired channel
+    // Assuming 'message' is the message object and 'channel' is the channel you want to send the embed to
+
+    interaction.followUp({ content: "leaderboard Generated!!" });
+    previousLB = Leaderboard
+    console.log(previousLB)
+    return interaction.channel.send({
+        content: "Here you go, This is the current Leaderboard stats " + interaction.user.username,
+        embeds: [embed]
+    });
+}
+
+async function GetStatsV2(interaction: any) {
+    //TODO Rework needed 
+    const discord_id = interaction.guild.id;
+    // console.log(discord_id)
+    // Fetch user info from the database
+    const discordInfo = await checkForDiscordById(discord_id);
+    // console.log(discordInfo)
+
+    if (!discordInfo) {
+        console.log("Discord not found");
+        await interaction.followUp({ content: "Discord not found." });
+        return;
+    }
+
+    const discordUsers = await getUsersFromDiscordId(discordInfo.id)
+    const startDate = getStartOfCurrentMonth();
+
+    const Leaderboard: any = [];
+    for (let i = 0; i < discordUsers.length; i++) {
+        const matchesThisMonth = await getMatchesFromMili(startDate, discordUsers[i].user);
+
+        // TODO Calculate Score for each match and then produce a score for the month so far
+
+        let MonthScore = 0;
+        let wins = 0
+        for (let j = 0; j < matchesThisMonth.length; j++) {
+            let kills = 0;
+            let deaths = 0
+            let assists = 0;
+            let firstBlood = 0;
+            let VisionScore = 0;
+
+            if (matchesThisMonth[j].kills > 0) {
+                kills = (matchesThisMonth[j].kills)
+            }
+            if (matchesThisMonth[j].deaths > 0) {
+                deaths = matchesThisMonth[j].deaths
+            }
+            if (matchesThisMonth[j].assists > 0) {
+                assists = (matchesThisMonth[j].assists / 2)
+            }
+            if (matchesThisMonth[j].first_blood_kill) {
+                firstBlood = 2
+            }
+            if (matchesThisMonth[j].vision_score > 0) {
+                VisionScore = matchesThisMonth[j].vision_score / 10
+            }
+
+            let totalScorePerMatch = kills + deaths + assists + firstBlood + VisionScore;
+
+            // FF
+            if (!matchesThisMonth[j].win && matchesThisMonth[j].game_ended_in_surrender) {
+                if (totalScorePerMatch > 0) {
+
+                    totalScorePerMatch = totalScorePerMatch * .5
+                } else {
+                    totalScorePerMatch = totalScorePerMatch * 1.5
+                }
+            }
+
+            let preWinRate = 0
+            if (j === 0) {
+                preWinRate = matchesThisMonth[j].win ? 1 : 0
+            } else {
+                if (wins === 0) {
+                    preWinRate = 0
+                } else {
+
+                    preWinRate = wins / j
+                }
+            }
+
+            if (matchesThisMonth[j].win) {
+                if (totalScorePerMatch < 0) {
+                    totalScorePerMatch = totalScorePerMatch * -.5
+                    totalScorePerMatch = totalScorePerMatch * preWinRate
+                } else {
+                    totalScorePerMatch = totalScorePerMatch * preWinRate
+                }
+
+            } else {
+                totalScorePerMatch = totalScorePerMatch * -.2
+            }
+            if (discordUsers[i].user?.uuid === "BM70M3qwNSqO0rav8Q18Qtv6FOWzEZQIBPhbSfmR9skWZeLEmDcBqudkIZCPNFxlg-90Rb49k6Kfjg") {
+
+                console.log("preWinRate", preWinRate, "totalScorePerMatch", totalScorePerMatch)
+            }
+
+            MonthScore += totalScorePerMatch
+            // if (matchesThisMonth.length < 5) {
+
+            //     MonthScore += (totalScorePerMatch / 5)
+            // } else {
+
+            //     MonthScore += (totalScorePerMatch / matchesThisMonth.length)
+            // }
+
+            if (matchesThisMonth[j].win) {
+                wins++
+            }
+
+        }
+        const winRate = wins / matchesThisMonth.length
+
+
+        Leaderboard.push({
+            user: discordUsers[i].user?.game_name,
+            score: MonthScore,
+            hasntPlayed: matchesThisMonth.length < 1,
+            gamesPlayed: matchesThisMonth.length,
+            winRate
+        })
+
+
+
+        console.log(Leaderboard)
     }
     const sortedLB = Leaderboard.sort((a: any, b: any) => {
         return b.score - a.score;
