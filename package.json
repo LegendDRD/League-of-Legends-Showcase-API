@@ -1,7 +1,7 @@
 {
   "name": "lol_showcase_api",
   "version": "0.0.1",
-  "description": "",
+  "description": "Express + Prisma API and discord.js bot that links Discord users to League of Legends accounts and builds stats and monthly leaderboards from the Riot Games API.",
   "main": "./dist/index.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
@@ -10,9 +10,13 @@
     "start": "node ./dist/index.js",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["league-of-legends", "riot-api", "discord-bot", "express", "prisma", "typescript"],
+  "author": "Damian Dowie",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LegendDRD/League-of-Legends-Showcase-API.git"
+  },
   "dependencies": {
     "@prisma/client": "^5.13.0",
     "axios": "^1.6.8",
